@@ -35,11 +35,11 @@ import {
   Star,
 } from "lucide-react"
 import type { Recipe, MealPlan } from "@/types/recipe"
-import { generateDynamicMealPlan, adjustMealPlan } from "@/lib/dynamic-ai-service"
+import { generateDynamicMealPlan, adjustMealPlan } from "@/lib/dynamic-ai-service-new"
 import { useAuth } from "@/app/firebase-provider"
 
 interface DynamicMealPlannerProps {
-  onAddMealPlan: (mealPlan: MealPlan, userId: string) => void
+  onAddMealPlan: (mealPlan: MealPlan) => void
   existingPlans: MealPlan[]
 }
 
@@ -330,7 +330,7 @@ export default function DynamicMealPlanner({ onAddMealPlan, existingPlans }: Dyn
           createdAt: new Date(),
         }
 
-        onAddMealPlan(mealPlan, user?.uid || "")
+        onAddMealPlan(mealPlan)
         savedCount++
       })
 

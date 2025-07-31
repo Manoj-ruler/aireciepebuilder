@@ -1,147 +1,63 @@
-import type { Recipe } from "@/types/recipe"
-import { aiCache } from "./ai-cache"
+import type { Recipe } from "@/types/recipe";
+import { aiCache } from "./ai-cache";
+import { generateRecipeImageEnhanced } from "./ai-image-service";
 
 // OpenRouter API configuration (GLM model)
-const OPENAI_API_KEY = "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"
-const OPENAI_API_URL = "https://openrouter.ai/api/v1/chat/completions"
+const OPENAI_API_KEY =
+  "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";
+const OPENAI_API_URL = "https://openrouter.ai/api/v1/chat/completions";
 
-// Gemini API configuration - OPTIMIZED AND WORKING PERFECTLY
-const GEMINI_API_KEY = "AIzaSyBpqSbrMGWsQnDj5Vmu2280ljDu4t9FPOc"
-const GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent"
+// Gemini API configuration - PRIMARY AI SERVICE
+const GEMINI_API_KEY = "AIzaSyAiRSHMjiGFXrEZXk1mynnO9qnaBwhJjuw";
+const GEMINI_API_URL =
+  "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent";
 
-// Enhanced fallback recipes
-const FALLBACK_RECIPES = [
-  {
-    title: "AI-Generated Honey Garlic Chicken",
-    description: "Tender chicken glazed with a perfect balance of sweet honey and savory garlic",
-    ingredients: [
-      "4 boneless chicken breasts (1.5 lbs)",
-      "1/3 cup honey",
-      "4 cloves garlic, minced",
-      "3 tbsp soy sauce",
-      "2 tbsp olive oil",
-      "1 tsp fresh ginger, grated",
-      "2 green onions, chopped",
-      "1 tsp sesame seeds",
-      "Salt and pepper to taste",
-    ],
-    instructions: [
-      "Season chicken breasts with salt and pepper on both sides",
-      "Heat olive oil in a large skillet over medium-high heat",
-      "Cook chicken for 6-7 minutes per side until golden brown and cooked through",
-      "In a small bowl, whisk together honey, minced garlic, soy sauce, and ginger",
-      "Pour the honey garlic sauce over the chicken in the skillet",
-      "Cook for 2-3 minutes, turning chicken to coat with the glaze",
-      "Remove from heat and garnish with chopped green onions and sesame seeds",
-      "Let rest for 2 minutes before serving",
-    ],
-    cookingTime: 20,
-    servings: 4,
-    difficulty: "easy" as const,
-    tags: ["chicken", "asian-inspired", "dinner", "gluten-free", "quick"],
-  },
-  {
-    title: "Mediterranean Quinoa Power Bowl",
-    description: "A nutritious and colorful bowl packed with Mediterranean flavors and plant-based protein",
-    ingredients: [
-      "1 cup quinoa, rinsed",
-      "2 cups vegetable broth",
-      "1 cucumber, diced",
-      "2 large tomatoes, diced",
-      "1/2 red onion, thinly sliced",
-      "1/2 cup kalamata olives, pitted",
-      "4 oz feta cheese, crumbled",
-      "1/4 cup extra virgin olive oil",
-      "3 tbsp fresh lemon juice",
-      "2 tbsp fresh parsley, chopped",
-      "1 tbsp fresh mint, chopped",
-      "1 tsp dried oregano",
-    ],
-    instructions: [
-      "Cook quinoa in vegetable broth according to package directions, then let cool",
-      "While quinoa cools, prepare all vegetables and herbs",
-      "In a large bowl, combine cooled quinoa, cucumber, tomatoes, and red onion",
-      "Add kalamata olives and crumbled feta cheese",
-      "In a small bowl, whisk together olive oil, lemon juice, oregano, salt, and pepper",
-      "Pour dressing over the quinoa mixture and toss gently",
-      "Fold in fresh parsley and mint",
-      "Let sit for 10 minutes to allow flavors to meld",
-      "Serve chilled or at room temperature",
-    ],
-    cookingTime: 25,
-    servings: 4,
-    difficulty: "easy" as const,
-    tags: ["vegetarian", "mediterranean", "healthy", "meal-prep", "gluten-free"],
-  },
-  {
-    title: "Classic Beef Stir-Fry",
-    description: "Quick and flavorful beef stir-fry with crisp vegetables in a savory sauce",
-    ingredients: [
-      "1 lb beef sirloin, sliced thin against the grain",
-      "2 tbsp vegetable oil, divided",
-      "1 bell pepper, sliced",
-      "1 onion, sliced",
-      "2 carrots, julienned",
-      "3 cloves garlic, minced",
-      "1 tbsp fresh ginger, grated",
-      "3 tbsp soy sauce",
-      "1 tbsp oyster sauce",
-      "1 tsp cornstarch",
-      "1 tsp sesame oil",
-      "2 green onions, chopped",
-      "Cooked rice for serving",
-    ],
-    instructions: [
-      "Marinate sliced beef with 1 tbsp soy sauce and cornstarch for 15 minutes",
-      "Heat 1 tbsp oil in a wok or large skillet over high heat",
-      "Stir-fry beef until browned, about 2-3 minutes, then remove and set aside",
-      "Add remaining oil to the pan",
-      "Stir-fry vegetables starting with carrots, then onion and bell pepper",
-      "Add garlic and ginger, stir-fry for 30 seconds until fragrant",
-      "Return beef to the pan",
-      "Add remaining soy sauce, oyster sauce, and sesame oil",
-      "Stir-fry everything together for 1-2 minutes",
-      "Garnish with green onions and serve immediately over rice",
-    ],
-    cookingTime: 18,
-    servings: 4,
-    difficulty: "easy" as const,
-    tags: ["beef", "asian", "stir-fry", "quick", "dinner"],
-  },
-]
+// 100% AI-GENERATED RECIPES - NO FALLBACKS!
 
 export async function generateRecipe(prompt: string): Promise<Recipe | null> {
-  console.log("🍳 AI Chef is working on your recipe:", prompt)
+  console.log("🍳 100% AI-Generated Recipe Starting:", prompt);
 
   // Check cache first for instant results
-  const cachedRecipe = aiCache.get(prompt, 'recipe')
+  const cachedRecipe = aiCache.get(prompt, "recipe");
   if (cachedRecipe) {
-    console.log("⚡ Instant recipe from cache!")
-    return cachedRecipe
+    console.log("⚡ Instant AI recipe from cache!");
+    return cachedRecipe;
   }
 
-  // IMMEDIATE FALLBACK - Don't wait for AI at all for now
-  console.log("🔄 Using smart fallback recipe (skipping AI for speed)")
-  const fallbackRecipe = generateContextualFallback(prompt)
-  // Cache fallback for shorter time (2 minutes)
-  aiCache.set(prompt, fallbackRecipe, 'recipe', 2 * 60 * 1000)
-  return fallbackRecipe
+  try {
+    // ONLY AI GENERATION - NO FALLBACKS!
+    console.log("🤖 Generating recipe with Gemini AI (no fallbacks)...");
+
+    const aiRecipe = await tryAIGeneration(prompt);
+
+    if (aiRecipe) {
+      console.log("✅ AI successfully created your recipe!");
+      // Cache the successful result
+      aiCache.set(prompt, aiRecipe, "recipe");
+      return aiRecipe;
+    }
+
+    console.error("❌ AI generation failed - no fallback available");
+    return null;
+  } catch (error) {
+    console.error("❌ Recipe generation error:", error);
+    return null;
+  }
 }
 
 async function tryAIGeneration(prompt: string): Promise<Recipe | null> {
-  try {
-    console.log("🤖 Connecting to GLM Chef via OpenRouter...")
+  console.log("🚀 STARTING GEMINI AI GENERATION!");
+  console.log("📝 Prompt:", prompt);
+  console.log("🔑 Gemini API Key:", GEMINI_API_KEY.substring(0, 20) + "...");
+  console.log("🌐 Gemini API URL:", GEMINI_API_URL);
 
+  try {
     const requestBody = {
-      model: "z-ai/glm-4.5-air:free",
-      messages: [
+      contents: [
         {
-          role: "system",
-          content: "You are a professional chef and recipe creator. You always respond with valid JSON only, no additional text or formatting."
-        },
-        {
-          role: "user",
-          content: `Create a detailed, delicious recipe based on this request: "${prompt}".
+          parts: [
+            {
+              text: `You are a professional chef and recipe creator. Create a detailed, delicious recipe based on this request: "${prompt}".
 
 Respond with ONLY a JSON object in this exact format:
 {
@@ -161,172 +77,159 @@ Requirements:
 - Use realistic cooking times
 - Difficulty must be "easy", "medium", or "hard"
 - Include 3-5 relevant tags
-- Make it sound delicious and achievable`
-        }
+- Make it sound delicious and achievable
+- Respond with ONLY the JSON object, no additional text`,
+            },
+          ],
+        },
       ],
-      temperature: 0.7,
-      max_tokens: 1000,
-      top_p: 0.9,
-      frequency_penalty: 0,
-      presence_penalty: 0
-    }
+      generationConfig: {
+        temperature: 0.7,
+        topK: 40,
+        topP: 0.95,
+        maxOutputTokens: 1000,
+      },
+    };
 
-    const controller = new AbortController()
-    const timeoutId = setTimeout(() => {
-      console.log("⏰ API timeout - falling back to cached recipes")
-      controller.abort()
-    }, 3000) // 3 second timeout for immediate fallback
+    console.log("📤 Sending request to Gemini...");
 
-    const response = await fetch(OPENAI_API_URL, {
+    const response = await fetch(`${GEMINI_API_URL}?key=${GEMINI_API_KEY}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${OPENAI_API_KEY}`,
       },
       body: JSON.stringify(requestBody),
-      signal: controller.signal,
-    })
+    });
 
-    clearTimeout(timeoutId)
+    console.log("📥 Gemini Response status:", response.status);
 
     if (!response.ok) {
-      const errorText = await response.text()
-      console.error(`❌ OpenAI API error (${response.status}):`, errorText)
-      return null
+      const errorText = await response.text();
+      console.error(`❌ GEMINI API ERROR (${response.status}):`, errorText);
+      return null;
     }
 
-    const data = await response.json()
+    const data = await response.json();
+    console.log("📊 Full Gemini response:", JSON.stringify(data, null, 2));
 
-    if (!data.choices?.[0]?.message?.content) {
-      console.error("❌ Invalid OpenAI response structure")
-      return null
+    if (!data.candidates?.[0]?.content?.parts?.[0]?.text) {
+      console.error("❌ Invalid Gemini response structure");
+      return null;
     }
 
-    const generatedText = data.choices[0].message.content.trim()
-    console.log("📝 OpenAI response received:", generatedText.substring(0, 200) + "...")
+    const generatedText = data.candidates[0].content.parts[0].text.trim();
+    console.log("📝 Gemini generated text:", generatedText);
 
     // Extract JSON from response
-    const jsonMatch = generatedText.match(/\{[\s\S]*\}/)
+    const jsonMatch = generatedText.match(/\{[\s\S]*\}/);
     if (!jsonMatch) {
-      console.error("❌ No JSON found in OpenAI response")
-      return null
+      console.error("❌ No JSON found in Gemini response");
+      return null;
     }
 
-    const recipeData = JSON.parse(jsonMatch[0])
+    const recipeData = JSON.parse(jsonMatch[0]);
+    console.log("🍳 Parsed recipe data:", recipeData);
 
     // Validate required fields
-    if (!recipeData.title || !recipeData.ingredients || !recipeData.instructions) {
-      console.error("❌ Missing required recipe fields")
-      return null
+    if (
+      !recipeData.title ||
+      !recipeData.ingredients ||
+      !recipeData.instructions
+    ) {
+      console.error("❌ Missing required recipe fields");
+      return null;
     }
+
+    // Generate AI image for the recipe
+    console.log("🎨 Generating AI image for recipe...");
+    const aiImageUrl = await generateRecipeImageEnhanced(
+      recipeData.title,
+      Array.isArray(recipeData.ingredients) ? recipeData.ingredients : []
+    );
 
     const recipe: Recipe = {
-      id: `ai_${Date.now()}`,
+      id: `gemini_${Date.now()}`,
       title: recipeData.title,
       description: recipeData.description || "A delicious AI-generated recipe",
-      ingredients: Array.isArray(recipeData.ingredients) ? recipeData.ingredients : [],
-      instructions: Array.isArray(recipeData.instructions) ? recipeData.instructions : [],
-      cookingTime: typeof recipeData.cookingTime === "number" ? recipeData.cookingTime : 30,
-      servings: typeof recipeData.servings === "number" ? recipeData.servings : 4,
-      difficulty: ["easy", "medium", "hard"].includes(recipeData.difficulty) ? recipeData.difficulty : "easy",
+      ingredients: Array.isArray(recipeData.ingredients)
+        ? recipeData.ingredients
+        : [],
+      instructions: Array.isArray(recipeData.instructions)
+        ? recipeData.instructions
+        : [],
+      cookingTime:
+        typeof recipeData.cookingTime === "number"
+          ? recipeData.cookingTime
+          : 30,
+      servings:
+        typeof recipeData.servings === "number" ? recipeData.servings : 4,
+      difficulty: ["easy", "medium", "hard"].includes(recipeData.difficulty)
+        ? recipeData.difficulty
+        : "easy",
       tags: Array.isArray(recipeData.tags) ? recipeData.tags : ["ai-generated"],
       createdAt: new Date(),
-      imageUrl: `/placeholder.svg?height=200&width=300&query=${encodeURIComponent(recipeData.title)}`,
-    }
+      imageUrl: aiImageUrl,
+    };
 
-    console.log("✅ OpenAI recipe created successfully:", recipe.title)
-    return recipe
+    console.log("✅ SUCCESS! Gemini recipe created:", recipe.title);
+    return recipe;
   } catch (error) {
-    console.error("❌ OpenAI generation failed:", error)
-    return null
+    console.error("❌ CRITICAL ERROR in Gemini generation:", error);
+    console.error(
+      "❌ Error stack:",
+      error instanceof Error ? error.stack : "No stack trace"
+    );
+    return null;
   }
 }
 
-function generateContextualFallback(prompt: string): Recipe {
-  console.log("🎯 Selecting perfect fallback recipe for:", prompt)
+// REMOVED: All fallback functions - 100% AI generation only!
 
-  const lowerPrompt = prompt.toLowerCase()
-  let selectedRecipe = FALLBACK_RECIPES[0] // Default
-
-  // Smart matching
-  if (lowerPrompt.includes("chicken") || lowerPrompt.includes("honey") || lowerPrompt.includes("garlic")) {
-    selectedRecipe = FALLBACK_RECIPES[0] // Honey Garlic Chicken
-  } else if (
-    lowerPrompt.includes("healthy") ||
-    lowerPrompt.includes("vegetarian") ||
-    lowerPrompt.includes("quinoa") ||
-    lowerPrompt.includes("mediterranean")
-  ) {
-    selectedRecipe = FALLBACK_RECIPES[1] // Mediterranean Quinoa Bowl
-  } else if (lowerPrompt.includes("beef") || lowerPrompt.includes("stir") || lowerPrompt.includes("quick")) {
-    selectedRecipe = FALLBACK_RECIPES[2] // Beef Stir-Fry
-  } else {
-    // Random selection for variety
-    selectedRecipe = FALLBACK_RECIPES[Math.floor(Math.random() * FALLBACK_RECIPES.length)]
-  }
-
-  return {
-    id: `fallback_${Date.now()}`,
-    title: selectedRecipe.title,
-    description: selectedRecipe.description,
-    ingredients: selectedRecipe.ingredients,
-    instructions: selectedRecipe.instructions,
-    cookingTime: selectedRecipe.cookingTime,
-    servings: selectedRecipe.servings,
-    difficulty: selectedRecipe.difficulty,
-    tags: selectedRecipe.tags,
-    createdAt: new Date(),
-    imageUrl: `/placeholder.svg?height=200&width=300&query=${encodeURIComponent(selectedRecipe.title)}`,
-  }
-}
-
-export async function generateMealPlan(prompt: string): Promise<Recipe[] | null> {
-  console.log("🗓️ Creating your weekly meal plan:", prompt)
+export async function generateMealPlan(
+  prompt: string
+): Promise<Recipe[] | null> {
+  console.log("🗓️ 100% AI-Generated Meal Plan Starting:", prompt);
 
   // Check cache first for instant results
-  const cachedMealPlan = aiCache.get(prompt, 'mealplan')
+  const cachedMealPlan = aiCache.get(prompt, "mealplan");
   if (cachedMealPlan) {
-    console.log("⚡ Instant meal plan from cache!")
-    return cachedMealPlan
+    console.log("⚡ Instant AI meal plan from cache!");
+    return cachedMealPlan;
   }
 
   try {
-    const aiMealPlan = await tryAIMealPlanGeneration(prompt)
+    // ONLY AI GENERATION - NO FALLBACKS!
+    console.log("🤖 Generating meal plan with Gemini AI (no fallbacks)...");
+
+    const aiMealPlan = await tryAIMealPlanGeneration(prompt);
+
     if (aiMealPlan && aiMealPlan.length > 0) {
-      console.log("✅ AI meal plan created successfully!")
+      console.log("✅ AI meal plan created successfully!");
       // Cache the successful result for 10 minutes
-      aiCache.set(prompt, aiMealPlan, 'mealplan', 10 * 60 * 1000)
-      return aiMealPlan
+      aiCache.set(prompt, aiMealPlan, "mealplan", 10 * 60 * 1000);
+      return aiMealPlan;
     }
 
-    console.log("🔄 Using curated meal plan")
-    const fallbackMealPlan = generateFallbackMealPlan()
-    // Cache fallback for shorter time (3 minutes)
-    aiCache.set(prompt, fallbackMealPlan, 'mealplan', 3 * 60 * 1000)
-    return fallbackMealPlan
+    console.error("❌ AI meal plan generation failed - no fallback available");
+    return null;
   } catch (error) {
-    console.error("❌ Meal plan generation error:", error)
-    const fallbackMealPlan = generateFallbackMealPlan()
-    // Cache fallback for shorter time (3 minutes)
-    aiCache.set(prompt, fallbackMealPlan, 'mealplan', 3 * 60 * 1000)
-    return fallbackMealPlan
+    console.error("❌ Meal plan generation error:", error);
+    return null;
   }
 }
 
-async function tryAIMealPlanGeneration(prompt: string): Promise<Recipe[] | null> {
+async function tryAIMealPlanGeneration(
+  prompt: string
+): Promise<Recipe[] | null> {
   try {
-    console.log("🤖 Connecting to GLM for meal plan via OpenRouter...")
+    console.log("🤖 Connecting to Gemini for meal plan generation...");
 
     const requestBody = {
-      model: "z-ai/glm-4.5-air:free",
-      messages: [
+      contents: [
         {
-          role: "system",
-          content: "You are a professional chef and meal planner. You always respond with valid JSON only, no additional text or formatting."
-        },
-        {
-          role: "user",
-          content: `Create 7 different recipes for a weekly meal plan based on: "${prompt}".
+          parts: [
+            {
+              text: `You are a professional chef and meal planner. Create 7 different recipes for a weekly meal plan based on: "${prompt}".
 
 Respond with ONLY a JSON array of recipe objects:
 [
@@ -342,164 +245,124 @@ Respond with ONLY a JSON array of recipe objects:
   }
 ]
 
-Make sure to include variety in cuisines, cooking methods, and meal types. Each recipe should be complete and different from the others.`
-        }
+Requirements:
+- Create exactly 7 different recipes
+- Include variety in cuisines, cooking methods, and meal types
+- Each recipe should be complete and different from the others
+- Include specific quantities for all ingredients
+- Write clear, detailed cooking instructions
+- Use realistic cooking times
+- Difficulty must be "easy", "medium", or "hard"
+- Include 3-5 relevant tags per recipe
+- Respond with ONLY the JSON array, no additional text`,
+            },
+          ],
+        },
       ],
-      temperature: 0.8,
-      max_tokens: 2000,
-      top_p: 0.9,
-      frequency_penalty: 0.3,
-      presence_penalty: 0.3
-    }
+      generationConfig: {
+        temperature: 0.8,
+        topK: 40,
+        topP: 0.95,
+        maxOutputTokens: 2000,
+      },
+    };
 
-    const controller = new AbortController()
-    const timeoutId = setTimeout(() => {
-      console.log("⏰ Meal plan API timeout - falling back to curated recipes")
-      controller.abort()
-    }, 3000) // 3 second timeout for immediate fallback
+    console.log("📤 Sending meal plan request to Gemini...");
 
-    const response = await fetch(OPENAI_API_URL, {
+    const response = await fetch(`${GEMINI_API_URL}?key=${GEMINI_API_KEY}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${OPENAI_API_KEY}`,
       },
       body: JSON.stringify(requestBody),
-      signal: controller.signal,
-    })
+    });
 
-    clearTimeout(timeoutId)
+    console.log("📥 Gemini meal plan response status:", response.status);
 
     if (!response.ok) {
-      const errorText = await response.text()
-      console.error(`❌ OpenAI meal plan API error (${response.status}):`, errorText)
-      return null
+      const errorText = await response.text();
+      console.error(
+        `❌ Gemini meal plan API error (${response.status}):`,
+        errorText
+      );
+      return null;
     }
 
-    const data = await response.json()
+    const data = await response.json();
+    console.log(
+      "📊 Full Gemini meal plan response:",
+      JSON.stringify(data, null, 2)
+    );
 
-    if (!data.choices?.[0]?.message?.content) {
-      console.error("❌ Invalid OpenAI meal plan response structure")
-      return null
+    if (!data.candidates?.[0]?.content?.parts?.[0]?.text) {
+      console.error("❌ Invalid Gemini meal plan response structure");
+      return null;
     }
 
-    const generatedText = data.choices[0].message.content.trim()
-    console.log("📝 OpenAI meal plan response received:", generatedText.substring(0, 200) + "...")
+    const generatedText = data.candidates[0].content.parts[0].text.trim();
+    console.log("📝 Gemini meal plan generated text:", generatedText);
 
     // Extract JSON from response
-    const jsonMatch = generatedText.match(/\[[\s\S]*\]/)
+    const jsonMatch = generatedText.match(/\[[\s\S]*\]/);
     if (!jsonMatch) {
-      console.error("❌ No JSON array found in OpenAI meal plan response")
-      return null
+      console.error("❌ No JSON array found in Gemini meal plan response");
+      return null;
     }
 
-    const recipesData = JSON.parse(jsonMatch[0])
+    const recipesData = JSON.parse(jsonMatch[0]);
 
     if (!Array.isArray(recipesData)) {
-      console.error("❌ Response is not an array")
-      return null
+      console.error("❌ Response is not an array");
+      return null;
     }
 
-    const recipes: Recipe[] = recipesData.map((recipeData: any, index: number) => ({
-      id: `meal_plan_${Date.now()}_${index}`,
-      title: recipeData.title || `Recipe ${index + 1}`,
-      description: recipeData.description || "A delicious meal",
-      ingredients: Array.isArray(recipeData.ingredients) ? recipeData.ingredients : ["Various ingredients"],
-      instructions: Array.isArray(recipeData.instructions) ? recipeData.instructions : ["Follow cooking instructions"],
-      cookingTime: typeof recipeData.cookingTime === "number" ? recipeData.cookingTime : 30,
-      servings: typeof recipeData.servings === "number" ? recipeData.servings : 4,
-      difficulty: ["easy", "medium", "hard"].includes(recipeData.difficulty) ? recipeData.difficulty : "easy",
-      tags: Array.isArray(recipeData.tags) ? recipeData.tags : ["meal-plan"],
-      createdAt: new Date(),
-      imageUrl: `/placeholder.svg?height=200&width=300&query=${encodeURIComponent(recipeData.title || `Recipe ${index + 1}`)}`,
-    }))
+    // Generate AI images for all meal plan recipes
+    console.log("🎨 Generating AI images for meal plan recipes...");
+    const recipes: Recipe[] = await Promise.all(
+      recipesData.map(async (recipeData: any, index: number) => {
+        const title = recipeData.title || `Recipe ${index + 1}`;
+        const ingredients = Array.isArray(recipeData.ingredients)
+          ? recipeData.ingredients
+          : ["Various ingredients"];
 
-    console.log(`✅ Generated ${recipes.length} recipes for OpenAI meal plan`)
-    return recipes
+        // Generate AI image for each recipe
+        const aiImageUrl = await generateRecipeImageEnhanced(
+          title,
+          ingredients
+        );
+
+        return {
+          id: `gemini_meal_plan_${Date.now()}_${index}`,
+          title,
+          description: recipeData.description || "A delicious meal",
+          ingredients,
+          instructions: Array.isArray(recipeData.instructions)
+            ? recipeData.instructions
+            : ["Follow cooking instructions"],
+          cookingTime:
+            typeof recipeData.cookingTime === "number"
+              ? recipeData.cookingTime
+              : 30,
+          servings:
+            typeof recipeData.servings === "number" ? recipeData.servings : 4,
+          difficulty: ["easy", "medium", "hard"].includes(recipeData.difficulty)
+            ? recipeData.difficulty
+            : "easy",
+          tags: Array.isArray(recipeData.tags)
+            ? recipeData.tags
+            : ["meal-plan"],
+          createdAt: new Date(),
+          imageUrl: aiImageUrl,
+        };
+      })
+    );
+
+    console.log(`✅ Generated ${recipes.length} recipes for Gemini meal plan`);
+    return recipes;
   } catch (error) {
-    console.error("❌ OpenAI meal plan generation failed:", error)
-    return null
+    console.error("❌ OpenAI meal plan generation failed:", error);
+    return null;
   }
 }
 
-function generateFallbackMealPlan(): Recipe[] {
-  const weeklyRecipes = [
-    {
-      title: "Monday: Lemon Herb Grilled Chicken",
-      description: "Juicy grilled chicken with fresh herbs and lemon",
-      ingredients: ["4 chicken breasts", "2 lemons", "Fresh herbs", "Olive oil", "Garlic"],
-      instructions: ["Marinate chicken", "Grill until cooked through", "Serve with lemon"],
-      cookingTime: 25,
-      servings: 4,
-      difficulty: "easy" as const,
-      tags: ["chicken", "grilled", "healthy"],
-    },
-    {
-      title: "Tuesday: Vegetable Pasta Primavera",
-      description: "Fresh seasonal vegetables tossed with pasta",
-      ingredients: ["Pasta", "Mixed vegetables", "Olive oil", "Garlic", "Parmesan"],
-      instructions: ["Cook pasta", "Sauté vegetables", "Combine and serve"],
-      cookingTime: 20,
-      servings: 4,
-      difficulty: "easy" as const,
-      tags: ["pasta", "vegetarian", "quick"],
-    },
-    {
-      title: "Wednesday: Asian Salmon Bowls",
-      description: "Glazed salmon over rice with vegetables",
-      ingredients: ["Salmon fillets", "Rice", "Soy sauce", "Honey", "Vegetables"],
-      instructions: ["Cook rice", "Glaze and cook salmon", "Assemble bowls"],
-      cookingTime: 30,
-      servings: 4,
-      difficulty: "medium" as const,
-      tags: ["salmon", "asian", "healthy"],
-    },
-    {
-      title: "Thursday: Mexican Black Bean Tacos",
-      description: "Flavorful vegetarian tacos with black beans",
-      ingredients: ["Black beans", "Tortillas", "Avocado", "Lime", "Cilantro"],
-      instructions: ["Season beans", "Warm tortillas", "Assemble tacos"],
-      cookingTime: 15,
-      servings: 4,
-      difficulty: "easy" as const,
-      tags: ["mexican", "vegetarian", "quick"],
-    },
-    {
-      title: "Friday: Beef and Mushroom Stir-Fry",
-      description: "Tender beef with mushrooms in savory sauce",
-      ingredients: ["Beef strips", "Mushrooms", "Soy sauce", "Garlic", "Rice"],
-      instructions: ["Stir-fry beef", "Add mushrooms", "Serve over rice"],
-      cookingTime: 18,
-      servings: 4,
-      difficulty: "easy" as const,
-      tags: ["beef", "stir-fry", "asian"],
-    },
-    {
-      title: "Saturday: Mediterranean Stuffed Peppers",
-      description: "Bell peppers stuffed with Mediterranean flavors",
-      ingredients: ["Bell peppers", "Quinoa", "Feta", "Tomatoes", "Herbs"],
-      instructions: ["Prepare filling", "Stuff peppers", "Bake until tender"],
-      cookingTime: 45,
-      servings: 4,
-      difficulty: "medium" as const,
-      tags: ["mediterranean", "vegetarian", "baked"],
-    },
-    {
-      title: "Sunday: Comfort Food Chicken Soup",
-      description: "Hearty homemade chicken soup",
-      ingredients: ["Chicken", "Vegetables", "Broth", "Noodles", "Herbs"],
-      instructions: ["Simmer chicken", "Add vegetables", "Serve hot"],
-      cookingTime: 60,
-      servings: 6,
-      difficulty: "easy" as const,
-      tags: ["soup", "comfort-food", "chicken"],
-    },
-  ]
-
-  return weeklyRecipes.map((recipe, index) => ({
-    ...recipe,
-    id: `weekly_${Date.now()}_${index}`,
-    createdAt: new Date(),
-    imageUrl: `/placeholder.svg?height=200&width=300&query=${encodeURIComponent(recipe.title)}`,
-  }))
-}
+// ALL FALLBACK FUNCTIONS REMOVED - 100% AI GENERATION ONLY!

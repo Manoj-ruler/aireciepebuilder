@@ -16,6 +16,8 @@ interface RecipeCardProps {
 
 export default function RecipeCard({ recipe, onSave, isSaved }: RecipeCardProps) {
   const [showDetails, setShowDetails] = useState(false)
+  const [imageLoaded, setImageLoaded] = useState(false)
+  const [imageError, setImageError] = useState(false)
 
   const getDifficultyColor = (difficulty: string) => {
     switch (difficulty) {
@@ -34,12 +36,32 @@ export default function RecipeCard({ recipe, onSave, isSaved }: RecipeCardProps)
     <>
       <Card className="bg-gray-800 border-gray-700 hover:border-orange-500 transition-all duration-300 transform hover:scale-105 cursor-pointer group">
         <div onClick={() => setShowDetails(true)}>
-          <div className="relative overflow-hidden rounded-t-lg">
+          <div className="relative overflow-hidden rounded-t-lg bg-gray-700">
+            {!imageLoaded && !imageError && (
+              <div className="w-full h-48 flex items-center justify-center">
+                <div className="animate-pulse text-gray-400">🎨 Generating AI image...</div>
+              </div>
+            )}
             <img
               src={recipe.imageUrl || "/placeholder.svg"}
               alt={recipe.title}
-              className="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-300"
+              className={`w-full h-48 object-cover group-hover:scale-110 transition-transform duration-300 ${
+                imageLoaded ? 'opacity-100' : 'opacity-0'
+              }`}
+              onLoad={() => setImageLoaded(true)}
+              onError={() => {
+                setImageError(true)
+                setImageLoaded(true)
+              }}
             />
+            {imageError && (
+              <div className="absolute inset-0 w-full h-48 flex items-center justify-center bg-gray-700">
+                <div className="text-gray-400 text-center">
+                  <div className="text-2xl mb-2">🍽️</div>
+                  <div className="text-sm">Recipe Image</div>
+                </div>
+              </div>
+            )}
             <div className="absolute top-2 right-2">
               <Badge className={`${getDifficultyColor(recipe.difficulty)} text-white`}>{recipe.difficulty}</Badge>
             </div>
@@ -102,11 +124,13 @@ export default function RecipeCard({ recipe, onSave, isSaved }: RecipeCardProps)
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <img
-                src={recipe.imageUrl || "/placeholder.svg"}
-                alt={recipe.title}
-                className="w-full h-64 object-cover rounded-lg"
-              />
+              <div className="relative bg-gray-700 rounded-lg overflow-hidden">
+                <img
+                  src={recipe.imageUrl || "/placeholder.svg"}
+                  alt={recipe.title}
+                  className="w-full h-64 object-cover rounded-lg"
+                />
+              </div>
 
               <div className="flex items-center justify-between mt-4 p-4 bg-gray-700 rounded-lg">
                 <div className="flex items-center">
