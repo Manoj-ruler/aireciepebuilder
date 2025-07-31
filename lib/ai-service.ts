@@ -1,9 +1,9 @@
 import type { Recipe } from "@/types/recipe"
 import { aiCache } from "./ai-cache"
 
-// OpenAI API configuration
-const OPENAI_API_KEY = "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"
-const OPENAI_API_URL = "https://api.openai.com/v1/chat/completions"
+// OpenRouter API configuration (GLM model)
+const OPENAI_API_KEY = "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"
+const OPENAI_API_URL = "https://openrouter.ai/api/v1/chat/completions"
 
 // Gemini API configuration - OPTIMIZED AND WORKING PERFECTLY
 const GEMINI_API_KEY = "AIzaSyBpqSbrMGWsQnDj5Vmu2280ljDu4t9FPOc"
@@ -120,36 +120,20 @@ export async function generateRecipe(prompt: string): Promise<Recipe | null> {
     return cachedRecipe
   }
 
-  try {
-    // Try AI generation first with your API key
-    const aiRecipe = await tryAIGeneration(prompt)
-    if (aiRecipe) {
-      console.log("✅ AI successfully created your recipe!")
-      // Cache the successful result
-      aiCache.set(prompt, aiRecipe, 'recipe')
-      return aiRecipe
-    }
-
-    console.log("🔄 Using smart fallback recipe")
-    const fallbackRecipe = generateContextualFallback(prompt)
-    // Cache fallback for shorter time (2 minutes)
-    aiCache.set(prompt, fallbackRecipe, 'recipe', 2 * 60 * 1000)
-    return fallbackRecipe
-  } catch (error) {
-    console.error("❌ Recipe generation error:", error)
-    const fallbackRecipe = generateContextualFallback(prompt)
-    // Cache fallback for shorter time (2 minutes)
-    aiCache.set(prompt, fallbackRecipe, 'recipe', 2 * 60 * 1000)
-    return fallbackRecipe
-  }
+  // IMMEDIATE FALLBACK - Don't wait for AI at all for now
+  console.log("🔄 Using smart fallback recipe (skipping AI for speed)")
+  const fallbackRecipe = generateContextualFallback(prompt)
+  // Cache fallback for shorter time (2 minutes)
+  aiCache.set(prompt, fallbackRecipe, 'recipe', 2 * 60 * 1000)
+  return fallbackRecipe
 }
 
 async function tryAIGeneration(prompt: string): Promise<Recipe | null> {
   try {
-    console.log("🤖 Connecting to OpenAI Chef...")
+    console.log("🤖 Connecting to GLM Chef via OpenRouter...")
 
     const requestBody = {
-      model: "gpt-3.5-turbo",
+      model: "z-ai/glm-4.5-air:free",
       messages: [
         {
           role: "system",
@@ -188,7 +172,10 @@ Requirements:
     }
 
     const controller = new AbortController()
-    const timeoutId = setTimeout(() => controller.abort(), 12000) // 12 second timeout for faster response
+    const timeoutId = setTimeout(() => {
+      console.log("⏰ API timeout - falling back to cached recipes")
+      controller.abort()
+    }, 3000) // 3 second timeout for immediate fallback
 
     const response = await fetch(OPENAI_API_URL, {
       method: "POST",
@@ -328,10 +315,10 @@ export async function generateMealPlan(prompt: string): Promise<Recipe[] | null>
 
 async function tryAIMealPlanGeneration(prompt: string): Promise<Recipe[] | null> {
   try {
-    console.log("🤖 Connecting to OpenAI for meal plan...")
+    console.log("🤖 Connecting to GLM for meal plan via OpenRouter...")
 
     const requestBody = {
-      model: "gpt-3.5-turbo",
+      model: "z-ai/glm-4.5-air:free",
       messages: [
         {
           role: "system",
@@ -366,7 +353,10 @@ Make sure to include variety in cuisines, cooking methods, and meal types. Each 
     }
 
     const controller = new AbortController()
-    const timeoutId = setTimeout(() => controller.abort(), 18000) // 18 second timeout for meal plans
+    const timeoutId = setTimeout(() => {
+      console.log("⏰ Meal plan API timeout - falling back to curated recipes")
+      controller.abort()
+    }, 3000) // 3 second timeout for immediate fallback
 
     const response = await fetch(OPENAI_API_URL, {
       method: "POST",
