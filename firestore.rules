@@ -1,0 +1,68 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Users can only access their own data
+    function isOwner(userId) {
+      return request.auth != null && request.auth.uid == userId;
+    }
+    
+    // Validate recipe data structure
+    function isValidRecipe(recipe) {
+      return recipe.keys().hasAll(['title', 'description', 'ingredients', 'instructions', 'cookingTime', 'servings', 'difficulty', 'tags', 'userId']) &&
+             recipe.title is string &&
+             recipe.description is string &&
+             recipe.ingredients is list &&
+             recipe.instructions is list &&
+             recipe.cookingTime is number &&
+             recipe.servings is number &&
+             recipe.difficulty in ['easy', 'medium', 'hard'] &&
+             recipe.tags is list &&
+             recipe.userId is string;
+    }
+    
+    // Validate meal plan data structure
+    function isValidMealPlan(mealPlan) {
+      return mealPlan.keys().hasAll(['date', 'mealType', 'recipeId', 'recipe', 'userId']) &&
+             mealPlan.date is timestamp &&
+             mealPlan.mealType in ['breakfast', 'lunch', 'dinner'] &&
+             mealPlan.recipeId is string &&
+             mealPlan.recipe is map &&
+             mealPlan.userId is string;
+    }
+    
+    // Recipes collection
+    match /recipes/{recipeId} {
+      allow read, write: if isOwner(resource.data.userId);
+      allow create: if isOwner(request.resource.data.userId) && 
+                       isValidRecipe(request.resource.data);
+      allow update: if isOwner(resource.data.userId) && 
+                       isValidRecipe(request.resource.data) &&
+                       request.resource.data.userId == resource.data.userId;
+      allow delete: if isOwner(resource.data.userId);
+    }
+    
+    // Saved recipes collection
+    match /savedRecipes/{savedRecipeId} {
+      allow read, write: if isOwner(resource.data.userId);
+      allow create: if isOwner(request.resource.data.userId);
+      allow delete: if isOwner(resource.data.userId);
+    }
+    
+    // Meal plans collection
+    match /mealPlans/{mealPlanId} {
+      allow read, write: if isOwner(resource.data.userId);
+      allow create: if isOwner(request.resource.data.userId) && 
+                       isValidMealPlan(request.resource.data);
+      allow update: if isOwner(resource.data.userId) && 
+                       isValidMealPlan(request.resource.data) &&
+                       request.resource.data.userId == resource.data.userId;
+      allow delete: if isOwner(resource.data.userId);
+    }
+    
+    // User profiles (optional for future use)
+    match /users/{userId} {
+      allow read, write: if isOwner(userId);
+      allow create: if isOwner(userId);
+    }
+  }
+}
