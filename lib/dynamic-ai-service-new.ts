@@ -1,8 +1,8 @@
 import type { Recipe } from "@/types/recipe"
-import { generateRecipeImageEnhanced } from "./ai-image-service";
+// Removed image generation import to save API quota
 
 // Gemini API configuration for 100% AI-generated dynamic meal planning
-const GEMINI_API_KEY = "AIzaSyAiRSHMjiGFXrEZXk1mynnO9qnaBwhJjuw";
+const GEMINI_API_KEY = "AIzaSyBP5Vd4HsD0s2ds3ZYQpSBtq5N9fgGq2rE";
 const GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent";
 
 interface PlanConstraints {
@@ -133,35 +133,30 @@ Requirements:
       return null;
     }
 
-    // Generate AI images for all dynamic meal plan recipes
-    console.log("🎨 Generating AI images for dynamic meal plan recipes...");
-    const recipes: Recipe[] = await Promise.all(
-      recipesData.map(async (recipeData: any, index: number) => {
-        const title = recipeData.title || `Recipe ${index + 1}`;
-        const ingredients = Array.isArray(recipeData.ingredients) 
-          ? recipeData.ingredients 
-          : ["Various ingredients"];
-        
-        // Generate AI image for each recipe
-        const aiImageUrl = await generateRecipeImageEnhanced(title, ingredients);
-        
-        return {
-          id: `gemini_dynamic_${Date.now()}_${index}`,
-          title,
-          description: recipeData.description || "A delicious AI-generated meal",
-          ingredients,
-          instructions: Array.isArray(recipeData.instructions) 
-            ? recipeData.instructions 
-            : ["Follow cooking instructions"],
-          cookingTime: typeof recipeData.cookingTime === "number" ? recipeData.cookingTime : 30,
-          servings: typeof recipeData.servings === "number" ? recipeData.servings : 4,
-          difficulty: ["easy", "medium", "hard"].includes(recipeData.difficulty) ? recipeData.difficulty : "easy",
-          tags: Array.isArray(recipeData.tags) ? recipeData.tags : ["ai-generated"],
-          createdAt: new Date(),
-          imageUrl: aiImageUrl,
-        };
-      })
-    );
+    // No image generation - removed completely to save API quota
+    console.log("⚡ No image generation - removed completely to save API quota");
+    const recipes: Recipe[] = recipesData.map((recipeData: any, index: number) => {
+      const title = recipeData.title || `Recipe ${index + 1}`;
+      const ingredients = Array.isArray(recipeData.ingredients) 
+        ? recipeData.ingredients 
+        : ["Various ingredients"];
+      
+      return {
+        id: `gemini_dynamic_${Date.now()}_${index}`,
+        title,
+        description: recipeData.description || "A delicious AI-generated meal",
+        ingredients,
+        instructions: Array.isArray(recipeData.instructions) 
+          ? recipeData.instructions 
+          : ["Follow cooking instructions"],
+        cookingTime: typeof recipeData.cookingTime === "number" ? recipeData.cookingTime : 30,
+        servings: typeof recipeData.servings === "number" ? recipeData.servings : 4,
+        difficulty: ["easy", "medium", "hard"].includes(recipeData.difficulty) ? recipeData.difficulty : "easy",
+        tags: Array.isArray(recipeData.tags) ? recipeData.tags : ["ai-generated"],
+        createdAt: new Date(),
+        // No image field - removed completely
+      };
+    });
 
     // Add estimated cost to each recipe
     recipes.forEach((recipe, index) => {
@@ -283,35 +278,30 @@ Requirements:
       return null;
     }
 
-    // Generate AI images for all adjusted recipes
-    console.log("🎨 Generating AI images for adjusted meal plan recipes...");
-    const adjustedRecipes: Recipe[] = await Promise.all(
-      recipesData.map(async (recipeData: any, index: number) => {
-        const title = recipeData.title || `Adjusted Recipe ${index + 1}`;
-        const ingredients = Array.isArray(recipeData.ingredients) 
-          ? recipeData.ingredients 
-          : ["Various ingredients"];
-        
-        // Generate AI image for each adjusted recipe
-        const aiImageUrl = await generateRecipeImageEnhanced(title, ingredients);
-        
-        return {
-          id: `gemini_adjusted_${Date.now()}_${index}`,
-          title,
-          description: recipeData.description || "An improved AI-generated meal",
-          ingredients,
-          instructions: Array.isArray(recipeData.instructions) 
-            ? recipeData.instructions 
-            : ["Follow cooking instructions"],
-          cookingTime: typeof recipeData.cookingTime === "number" ? recipeData.cookingTime : 30,
-          servings: typeof recipeData.servings === "number" ? recipeData.servings : 4,
-          difficulty: ["easy", "medium", "hard"].includes(recipeData.difficulty) ? recipeData.difficulty : "easy",
-          tags: Array.isArray(recipeData.tags) ? recipeData.tags : ["ai-generated"],
-          createdAt: new Date(),
-          imageUrl: aiImageUrl,
-        };
-      })
-    );
+    // No image generation - removed completely to save API quota
+    console.log("⚡ No image generation - removed completely to save API quota");
+    const adjustedRecipes: Recipe[] = recipesData.map((recipeData: any, index: number) => {
+      const title = recipeData.title || `Adjusted Recipe ${index + 1}`;
+      const ingredients = Array.isArray(recipeData.ingredients) 
+        ? recipeData.ingredients 
+        : ["Various ingredients"];
+      
+      return {
+        id: `gemini_adjusted_${Date.now()}_${index}`,
+        title,
+        description: recipeData.description || "An improved AI-generated meal",
+        ingredients,
+        instructions: Array.isArray(recipeData.instructions) 
+          ? recipeData.instructions 
+          : ["Follow cooking instructions"],
+        cookingTime: typeof recipeData.cookingTime === "number" ? recipeData.cookingTime : 30,
+        servings: typeof recipeData.servings === "number" ? recipeData.servings : 4,
+        difficulty: ["easy", "medium", "hard"].includes(recipeData.difficulty) ? recipeData.difficulty : "easy",
+        tags: Array.isArray(recipeData.tags) ? recipeData.tags : ["ai-generated"],
+        createdAt: new Date(),
+        // No image field - removed completely
+      };
+    });
 
     // Add estimated cost to each recipe
     adjustedRecipes.forEach((recipe, index) => {

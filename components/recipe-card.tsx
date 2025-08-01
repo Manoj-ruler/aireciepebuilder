@@ -39,65 +39,18 @@ export default function RecipeCard({ recipe, onSave, isSaved }: RecipeCardProps)
         <div className="absolute inset-0 -translate-x-full animate-shimmer bg-gradient-to-r from-transparent via-white/5 to-transparent group-hover:translate-x-full transition-transform duration-1000"></div>
         
         <div onClick={() => setShowDetails(true)}>
-          <div className="relative overflow-hidden rounded-t-2xl bg-gradient-to-br from-gray-800/50 to-gray-900/50">
-            {/* AI Badge */}
-            <div className="absolute top-3 left-3 z-10">
+          {/* Header with AI Badge and Difficulty */}
+          <div className="p-4 border-b border-gray-200/50">
+            <div className="flex items-center justify-between">
               <div className="flex items-center space-x-1 bg-gradient-primary px-2 py-1 rounded-full text-xs font-semibold text-white">
                 <Sparkles className="h-3 w-3 animate-pulse" />
                 <span>AI Generated</span>
               </div>
-            </div>
-
-            {/* Loading State */}
-            {!imageLoaded && !imageError && (
-              <div className="w-full h-48 sm:h-52 md:h-56 flex items-center justify-center bg-gradient-to-br from-sky-100/10 to-emerald-100/10">
-                <div className="text-center">
-                  <ChefHat className="h-8 w-8 text-sky-400 mx-auto mb-2 animate-bounce" />
-                  <div className="text-sky-400 font-medium text-sm">🎨 AI Chef Creating Image...</div>
-                  <div className="flex justify-center space-x-1 mt-2">
-                    <div className="w-1 h-1 bg-sky-400 rounded-full animate-bounce"></div>
-                    <div className="w-1 h-1 bg-sky-400 rounded-full animate-bounce delay-100"></div>
-                    <div className="w-1 h-1 bg-sky-400 rounded-full animate-bounce delay-200"></div>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* Recipe Image */}
-            <img
-              src={recipe.imageUrl || "/placeholder.svg"}
-              alt={recipe.title}
-              className={`w-full h-48 sm:h-52 md:h-56 object-cover group-hover:scale-110 transition-transform duration-700 ${
-                imageLoaded ? 'opacity-100' : 'opacity-0'
-              }`}
-              onLoad={() => setImageLoaded(true)}
-              onError={() => {
-                setImageError(true)
-                setImageLoaded(true)
-              }}
-            />
-
-            {/* Error State */}
-            {imageError && (
-              <div className="absolute inset-0 w-full h-48 sm:h-52 md:h-56 flex items-center justify-center bg-gradient-to-br from-gray-700/80 to-gray-800/80">
-                <div className="text-center">
-                  <div className="text-4xl mb-3 animate-bounce">🍽️</div>
-                  <div className="text-gray-300 font-medium">Delicious Recipe</div>
-                  <div className="text-xs text-gray-400 mt-1">Image loading...</div>
-                </div>
-              </div>
-            )}
-
-            {/* Difficulty Badge */}
-            <div className="absolute top-3 right-3">
               <Badge className={`${getDifficultyColor(recipe.difficulty)} text-white font-semibold px-3 py-1 rounded-full shadow-lg`}>
                 <Star className="h-3 w-3 mr-1" />
                 {recipe.difficulty}
               </Badge>
             </div>
-
-            {/* Gradient Overlay */}
-            <div className="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-gray-900/80 to-transparent"></div>
           </div>
 
           {/* Card Content */}
@@ -189,60 +142,7 @@ export default function RecipeCard({ recipe, onSave, isSaved }: RecipeCardProps)
           </DialogHeader>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 pt-6">
-            {/* Left Column - Image & Stats */}
-            <div className="space-y-6">
-              {/* Enhanced Recipe Image */}
-              <div className="relative bg-gradient-to-br from-gray-800/50 to-gray-900/50 rounded-3xl overflow-hidden group">
-                <img
-                  src={recipe.imageUrl || "/placeholder.svg"}
-                  alt={recipe.title}
-                  className="w-full h-64 md:h-80 object-cover transition-transform duration-500 group-hover:scale-105"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent"></div>
-                <div className="absolute bottom-4 left-4 right-4">
-                  <div className="flex items-center justify-between">
-                    <Badge className={`${getDifficultyColor(recipe.difficulty)} text-white font-semibold px-4 py-2 rounded-full shadow-lg`}>
-                      <Star className="h-4 w-4 mr-2" />
-                      {recipe.difficulty.charAt(0).toUpperCase() + recipe.difficulty.slice(1)}
-                    </Badge>
-                  </div>
-                </div>
-              </div>
-
-              {/* Enhanced Stats Grid */}
-              <div className="grid grid-cols-2 gap-4">
-                <div className="glass-button p-4 rounded-2xl text-center group hover:bg-sky-500/10 transition-all duration-300">
-                  <Clock className="h-6 w-6 text-sky-400 mx-auto mb-2 group-hover:animate-wiggle" />
-                  <div className="text-lg font-bold text-white">{recipe.cookingTime}</div>
-                  <div className="text-xs text-gray-400">minutes</div>
-                </div>
-                <div className="glass-button p-4 rounded-2xl text-center group hover:bg-emerald-500/10 transition-all duration-300">
-                  <Users className="h-6 w-6 text-emerald-400 mx-auto mb-2 group-hover:animate-wiggle" />
-                  <div className="text-lg font-bold text-white">{recipe.servings}</div>
-                  <div className="text-xs text-gray-400">servings</div>
-                </div>
-              </div>
-
-              {/* Enhanced Tags Section */}
-              <div className="glass-button p-6 rounded-2xl">
-                <h3 className="text-lg font-bold text-gradient-secondary mb-4 flex items-center">
-                  <Sparkles className="h-5 w-5 mr-2 animate-pulse" />
-                  Recipe Tags
-                </h3>
-                <div className="flex flex-wrap gap-2">
-                  {recipe.tags.map((tag, index) => (
-                    <Badge 
-                      key={index} 
-                      className="bg-gradient-to-r from-sky-500/20 to-emerald-500/20 text-sky-300 border-sky-400/30 hover:from-sky-500/30 hover:to-emerald-500/30 transition-all duration-300 px-3 py-2 rounded-full interactive-scale"
-                    >
-                      #{tag}
-                    </Badge>
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            {/* Right Column - Ingredients & Instructions */}
+            {/* Recipe Details - Single Column Layout */}
             <div className="space-y-6">
               {/* Enhanced Ingredients */}
               <div className="glass-button p-6 rounded-2xl">

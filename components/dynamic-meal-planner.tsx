@@ -187,37 +187,75 @@ export default function DynamicMealPlanner({ onAddMealPlan, existingPlans }: Dyn
         prompt = parts.join(" ") + "."
       }
 
-      console.log("Generating plan with prompt:", prompt)
-      console.log("Constraints:", constraints)
+      console.log("🚀 Generating plan with prompt:", prompt)
+      console.log("📋 Constraints:", constraints)
 
-      const generatedPlan = await generateDynamicMealPlan(prompt, constraints)
+      // Add loading toast
+      toast({
+        title: "🤖 AI Chef Working...",
+        description: "Creating your smart meal plan...",
+      })
 
-      if (generatedPlan && generatedPlan.length > 0) {
-        setCurrentPlan(generatedPlan)
-        setPlanFeedback([])
+      try {
+        const generatedPlan = await generateDynamicMealPlan(prompt, constraints)
+        
+        console.log("📊 Generated plan result:", generatedPlan)
 
-        // Calculate estimated cost
-        const totalCost = generatedPlan.reduce((sum, recipe) => {
-          return (
-            sum +
-            ((recipe as any).estimatedCost || constraints.budget / (constraints.days * constraints.mealTypes.length))
-          )
-        }, 0)
-        setEstimatedCost(totalCost)
+        if (generatedPlan && generatedPlan.length > 0) {
+          console.log("✅ Plan generated successfully:", generatedPlan.length, "recipes")
+          setCurrentPlan(generatedPlan)
+          setPlanFeedback([])
 
-        // Switch to results tab
-        setActiveTab("results")
+          // Calculate estimated cost
+          const totalCost = generatedPlan.reduce((sum, recipe) => {
+            return (
+              sum +
+              ((recipe as any).estimatedCost || constraints.budget / (constraints.days * constraints.mealTypes.length))
+            )
+          }, 0)
+          setEstimatedCost(totalCost)
 
-        toast({
-          title: "Success!",
-          description: `Generated ${generatedPlan.length} recipes for your dynamic meal plan`,
-        })
-      } else {
-        toast({
-          title: "Generation Failed",
-          description: "Failed to generate meal plan. Please try different constraints.",
-          variant: "destructive",
-        })
+          // Switch to results tab
+          setActiveTab("results")
+
+          toast({
+            title: "🎉 Smart Meal Plan Created!",
+            description: `Generated ${generatedPlan.length} personalized recipes for your meal plan`,
+          })
+        } else {
+          throw new Error("No recipes generated")
+        }
+      } catch (apiError) {
+        console.error("❌ API Error:", apiError)
+        
+        // Fallback: Create a simple meal plan using the regular AI service
+        console.log("🔄 Falling back to regular AI service...")
+        
+        try {
+          const { generateMealPlan } = await import("@/lib/ai-service")
+          const fallbackPlan = await generateMealPlan(prompt)
+          
+          if (fallbackPlan && fallbackPlan.length > 0) {
+            setCurrentPlan(fallbackPlan)
+            setPlanFeedback([])
+            setEstimatedCost(constraints.budget)
+            setActiveTab("results")
+            
+            toast({
+              title: "🎉 Meal Plan Created!",
+              description: `Generated ${fallbackPlan.length} recipes using fallback method`,
+            })
+          } else {
+            throw new Error("Fallback also failed")
+          }
+        } catch (fallbackError) {
+          console.error("❌ Fallback also failed:", fallbackError)
+          toast({
+            title: "Generation Failed",
+            description: "Unable to generate meal plan. Please check your internet connection and try again.",
+            variant: "destructive",
+          })
+        }
       }
     } catch (error) {
       console.error("Error generating dynamic meal plan:", error)

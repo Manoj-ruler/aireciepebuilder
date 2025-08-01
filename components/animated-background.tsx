@@ -12,12 +12,14 @@ interface Particle {
   hue: number
   saturation: number
   lightness: number
-  type: "bubble" | "sparkle" | "wave" | "orb" | "trail"
+  type: "bubble" | "sparkle" | "wave" | "orb" | "trail" | "cooking"
   angle: number
   speed: number
   life: number
   maxLife: number
   trail: { x: number; y: number; opacity: number }[]
+  cookingItem?: string
+  rotation?: number
 }
 
 interface Wave {
@@ -40,8 +42,23 @@ export default function AnimatedBackground() {
   const timeRef = useRef(0)
 
   const createParticle = useCallback((canvas: HTMLCanvasElement): Particle => {
-    const types: Particle["type"][] = ["bubble", "sparkle", "wave", "orb", "trail"]
+    // Heavily favor cooking items (fruits & vegetables) - 70% chance
+    const types: Particle["type"][] = [
+      "cooking", "cooking", "cooking", "cooking", "cooking", "cooking", "cooking", // 70% cooking items
+      "bubble", "sparkle", "orb" // 30% other subtle effects
+    ]
     const type = types[Math.floor(Math.random() * types.length)]
+    
+    // Only fruits and vegetables for the cooking particle type
+    const cookingItems = [
+      // Fresh Fruits
+      "🍎", "🍊", "🍌", "🍇", "🍓", "🫐", "🍑", "🥝", "🍋", "🥥",
+      "🍒", "🍑", "🥭", "🍍", "🫒", "🥑", "🍈", "🍉", "🍐", "🥧",
+      
+      // Fresh Vegetables  
+      "🍅", "🥕", "🌽", "🥒", "🥬", "🥦", "🧄", "🧅", "🌶️", "🫑",
+      "🥔", "🍄", "🍆", "🥖", "🌿", "🥗", "🫛", "🌱", "🥜", "🫘"
+    ]
 
     // Beautiful color palette: whites, blues, greens, with golden accents
     const colorPalettes = [
@@ -56,12 +73,12 @@ export default function AnimatedBackground() {
 
     const palette = colorPalettes[Math.floor(Math.random() * colorPalettes.length)]
 
-    return {
+    const particle = {
       x: Math.random() * canvas.width,
       y: Math.random() * canvas.height,
       vx: (Math.random() - 0.5) * 2,
       vy: (Math.random() - 0.5) * 2,
-      size: Math.random() * 40 + 10,
+      size: type === "cooking" ? Math.random() * 30 + 20 : Math.random() * 40 + 10,
       opacity: Math.random() * 0.8 + 0.2,
       hue: palette.hue + (Math.random() - 0.5) * 30,
       saturation: palette.saturation + (Math.random() - 0.5) * 20,
@@ -72,7 +89,11 @@ export default function AnimatedBackground() {
       life: 0,
       maxLife: Math.random() * 1000 + 500,
       trail: [],
+      cookingItem: type === "cooking" ? cookingItems[Math.floor(Math.random() * cookingItems.length)] : undefined,
+      rotation: type === "cooking" ? Math.random() * Math.PI * 2 : undefined,
     }
+
+    return particle
   }, [])
 
   const createWave = useCallback((canvas: HTMLCanvasElement): Wave => {
@@ -194,6 +215,35 @@ export default function AnimatedBackground() {
         ctx.arc(particle.x, particle.y, Math.max(1, particle.size * 0.5), 0, Math.PI * 2)
         ctx.fill()
         break
+
+      case "cooking":
+        // Cooking items (fruits, vegetables, kitchen utensils)
+        if (particle.cookingItem && particle.rotation !== undefined) {
+          ctx.save()
+          
+          // Move to particle position
+          ctx.translate(particle.x, particle.y)
+          
+          // Apply rotation for natural floating effect
+          ctx.rotate(particle.rotation + time * 0.001)
+          
+          // Set font size based on particle size
+          const fontSize = Math.max(16, particle.size * 0.8)
+          ctx.font = `${fontSize}px Arial`
+          ctx.textAlign = 'center'
+          ctx.textBaseline = 'middle'
+          
+          // Add subtle glow effect
+          ctx.shadowBlur = 8
+          ctx.shadowColor = `hsla(${particle.hue}, ${particle.saturation}%, ${particle.lightness}%, 0.3)`
+          
+          // Draw the cooking item emoji
+          ctx.globalAlpha = particle.opacity * 0.8
+          ctx.fillText(particle.cookingItem, 0, 0)
+          
+          ctx.restore()
+        }
+        break
     }
 
     ctx.restore()
@@ -218,16 +268,8 @@ export default function AnimatedBackground() {
 
   const updateParticle = useCallback(
     (particle: Particle, canvas: HTMLCanvasElement, time: number, mouseX: number, mouseY: number) => {
-      // Mouse interaction
-      const dx = mouseX - particle.x
-      const dy = mouseY - particle.y
-      const distance = Math.sqrt(dx * dx + dy * dy)
-
-      if (distance < 150) {
-        const force = (150 - distance) / 150
-        particle.vx += (dx / distance) * force * 0.5
-        particle.vy += (dy / distance) * force * 0.5
-      }
+      // Skip mouse interaction for maximum performance
+      // Mouse interaction removed to prevent lag
 
       // Physics
       particle.x += particle.vx
@@ -235,13 +277,24 @@ export default function AnimatedBackground() {
       particle.angle += 0.02
       particle.life++
 
-      // Gentle drift
-      particle.vx += (Math.random() - 0.5) * 0.1
-      particle.vy += (Math.random() - 0.5) * 0.1
-
-      // Damping
-      particle.vx *= 0.99
-      particle.vy *= 0.99
+      // Smoother gentle drift for cooking items
+      if (particle.type === "cooking") {
+        particle.vx += (Math.random() - 0.5) * 0.05 // Gentler movement for fruits/vegetables
+        particle.vy += (Math.random() - 0.5) * 0.05
+        particle.vx *= 0.995 // Less damping for smoother float
+        particle.vy *= 0.995
+        
+        // Update rotation for smooth spinning
+        if (particle.rotation !== undefined) {
+          particle.rotation += 0.005 // Slow, smooth rotation
+        }
+      } else {
+        // Regular drift for other particles
+        particle.vx += (Math.random() - 0.5) * 0.1
+        particle.vy += (Math.random() - 0.5) * 0.1
+        particle.vx *= 0.99
+        particle.vy *= 0.99
+      }
 
       // Trail effect for trail particles
       if (particle.type === "trail") {
@@ -289,77 +342,54 @@ export default function AnimatedBackground() {
       particlesRef.current = []
       wavesRef.current = []
 
-      // Create particles
-      for (let i = 0; i < 80; i++) {
+      // Create multiple static fruits and vegetables for visual appeal
+      for (let i = 0; i < 12; i++) {
         particlesRef.current.push(createParticle(canvas))
       }
 
-      // Create waves
-      for (let i = 0; i < 5; i++) {
-        wavesRef.current.push(createWave(canvas))
-      }
+      // No waves for maximum performance
+      wavesRef.current = []
     }
 
     const animate = () => {
-      timeRef.current += 1
+      timeRef.current += 0.05 // Very slow time increment
       const time = timeRef.current
 
-      // Create beautiful gradient background
-      const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height)
-      gradient.addColorStop(0, `hsl(${200 + Math.sin(time * 0.001) * 20}, 60%, 95%)`)
-      gradient.addColorStop(0.3, `hsl(${180 + Math.sin(time * 0.0015) * 15}, 50%, 92%)`)
-      gradient.addColorStop(0.6, `hsl(${160 + Math.sin(time * 0.002) * 10}, 40%, 90%)`)
-      gradient.addColorStop(1, `hsl(${140 + Math.sin(time * 0.0025) * 25}, 45%, 88%)`)
-
-      ctx.fillStyle = gradient
+      // Static background - no gradient calculations
+      ctx.fillStyle = '#f0f9ff'
       ctx.fillRect(0, 0, canvas.width, canvas.height)
 
-      // Draw animated waves
-      wavesRef.current.forEach((wave) => {
-        wave.phase += wave.speed
-        drawWave(ctx, wave, time, canvas)
-      })
-
-      // Update and draw particles
-      particlesRef.current.forEach((particle) => {
-        updateParticle(particle, canvas, time, mouseRef.current.x, mouseRef.current.y)
-        drawParticle(ctx, particle, time)
-      })
-
-      // Add new particles occasionally
-      if (Math.random() < 0.02 && particlesRef.current.length < 100) {
-        particlesRef.current.push(createParticle(canvas))
-      }
-
-      // Connection lines between nearby particles
-      ctx.save()
+      // Draw all particles with minimal animation
       for (let i = 0; i < particlesRef.current.length; i++) {
-        for (let j = i + 1; j < particlesRef.current.length; j++) {
-          const p1 = particlesRef.current[i]
-          const p2 = particlesRef.current[j]
-          const dx = p1.x - p2.x
-          const dy = p1.y - p2.y
-          const distance = Math.sqrt(dx * dx + dy * dy)
-
-          if (distance < 120) {
-            const opacity = ((120 - distance) / 120) * 0.2
-            ctx.strokeStyle = `rgba(255, 255, 255, ${opacity})`
-            ctx.lineWidth = 1
-            ctx.beginPath()
-            ctx.moveTo(p1.x, p1.y)
-            ctx.lineTo(p2.x, p2.y)
-            ctx.stroke()
-          }
+        const particle = particlesRef.current[i]
+        
+        // Very gentle movement to avoid lag
+        particle.x += particle.vx * 0.2
+        particle.y += particle.vy * 0.2
+        
+        // Simple boundary wrapping
+        if (particle.x < -50) particle.x = canvas.width + 50
+        if (particle.x > canvas.width + 50) particle.x = -50
+        if (particle.y < -50) particle.y = canvas.height + 50
+        if (particle.y > canvas.height + 50) particle.y = -50
+        
+        // Draw only cooking items (fruits & vegetables)
+        if (particle.type === "cooking" && particle.cookingItem) {
+          ctx.font = '28px Arial'
+          ctx.textAlign = 'center'
+          ctx.textBaseline = 'middle'
+          ctx.globalAlpha = 0.8
+          ctx.fillText(particle.cookingItem, particle.x, particle.y)
+          ctx.globalAlpha = 1
         }
       }
-      ctx.restore()
 
       animationRef.current = requestAnimationFrame(animate)
     }
 
     resizeCanvas()
     initParticles()
-    animate()
+    animationRef.current = requestAnimationFrame(animate)
 
     window.addEventListener("resize", resizeCanvas)
     window.addEventListener("mousemove", handleMouseMove)

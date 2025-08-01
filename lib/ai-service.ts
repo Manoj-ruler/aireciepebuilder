@@ -1,6 +1,6 @@
 import type { Recipe } from "@/types/recipe";
 import { aiCache } from "./ai-cache";
-import { generateRecipeImageEnhanced } from "./ai-image-service";
+// Removed image generation import to save API quota
 
 // OpenRouter API configuration (GLM model)
 const OPENAI_API_KEY =
@@ -8,7 +8,7 @@ const OPENAI_API_KEY =
 const OPENAI_API_URL = "https://openrouter.ai/api/v1/chat/completions";
 
 // Gemini API configuration - PRIMARY AI SERVICE
-const GEMINI_API_KEY = "AIzaSyAiRSHMjiGFXrEZXk1mynnO9qnaBwhJjuw";
+const GEMINI_API_KEY = "AIzaSyBP5Vd4HsD0s2ds3ZYQpSBtq5N9fgGq2rE";
 const GEMINI_API_URL =
   "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent";
 
@@ -140,12 +140,8 @@ Requirements:
       return null;
     }
 
-    // Generate AI image for the recipe
-    console.log("🎨 Generating AI image for recipe...");
-    const aiImageUrl = await generateRecipeImageEnhanced(
-      recipeData.title,
-      Array.isArray(recipeData.ingredients) ? recipeData.ingredients : []
-    );
+    // No image generation - removed to save API quota
+    console.log("⚡ No image generation - removed to save API quota");
 
     const recipe: Recipe = {
       id: `gemini_${Date.now()}`,
@@ -168,7 +164,7 @@ Requirements:
         : "easy",
       tags: Array.isArray(recipeData.tags) ? recipeData.tags : ["ai-generated"],
       createdAt: new Date(),
-      imageUrl: aiImageUrl,
+      // No image field - removed completely
     };
 
     console.log("✅ SUCCESS! Gemini recipe created:", recipe.title);
@@ -316,20 +312,16 @@ Requirements:
       return null;
     }
 
-    // Generate AI images for all meal plan recipes
-    console.log("🎨 Generating AI images for meal plan recipes...");
-    const recipes: Recipe[] = await Promise.all(
-      recipesData.map(async (recipeData: any, index: number) => {
+    // Skip image generation for meal plans to save API quota
+    console.log(
+      "⚡ Skipping image generation for meal plans to save API quota"
+    );
+    const recipes: Recipe[] = recipesData.map(
+      (recipeData: any, index: number) => {
         const title = recipeData.title || `Recipe ${index + 1}`;
         const ingredients = Array.isArray(recipeData.ingredients)
           ? recipeData.ingredients
           : ["Various ingredients"];
-
-        // Generate AI image for each recipe
-        const aiImageUrl = await generateRecipeImageEnhanced(
-          title,
-          ingredients
-        );
 
         return {
           id: `gemini_meal_plan_${Date.now()}_${index}`,
@@ -352,9 +344,9 @@ Requirements:
             ? recipeData.tags
             : ["meal-plan"],
           createdAt: new Date(),
-          imageUrl: aiImageUrl,
+          // No image field - removed completely
         };
-      })
+      }
     );
 
     console.log(`✅ Generated ${recipes.length} recipes for Gemini meal plan`);
