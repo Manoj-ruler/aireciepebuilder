@@ -10,7 +10,7 @@ export interface Recipe {
   tags: string[]
   createdAt: Date
   userId?: string
-  imageUrl: string
+  imageUrl?: string // Made optional since we removed image generation
 }
 
 export interface MealPlan {

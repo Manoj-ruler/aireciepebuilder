@@ -540,21 +540,12 @@ export default function MealPlanCalendar({ mealPlans, recipes, onAddMealPlan, on
                 {/* Left Column - Image & Stats */}
                 <div className="space-y-6">
                   {/* Enhanced Recipe Image */}
-                  <div className="relative bg-gradient-to-br from-gray-800/50 to-gray-900/50 rounded-3xl overflow-hidden group">
-                    <img
-                      src={selectedRecipeForModal.imageUrl || "/placeholder.svg"}
-                      alt={selectedRecipeForModal.title}
-                      className="w-full h-64 md:h-80 object-cover transition-transform duration-500 group-hover:scale-105"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent"></div>
-                    <div className="absolute bottom-4 left-4 right-4">
-                      <div className="flex items-center justify-between">
-                        <Badge className="bg-gradient-primary text-white font-semibold px-4 py-2 rounded-full shadow-lg">
-                          <Star className="h-4 w-4 mr-2" />
-                          {selectedRecipeForModal.difficulty?.charAt(0).toUpperCase() + selectedRecipeForModal.difficulty?.slice(1) || 'Medium'}
-                        </Badge>
-                      </div>
-                    </div>
+                  {/* Recipe Header with Difficulty Badge */}
+                  <div className="glass-button p-4 rounded-2xl text-center">
+                    <Badge className="bg-gradient-primary text-white font-semibold px-4 py-2 rounded-full shadow-lg">
+                      <Star className="h-4 w-4 mr-2" />
+                      {selectedRecipeForModal.difficulty?.charAt(0).toUpperCase() + selectedRecipeForModal.difficulty?.slice(1) || 'Medium'} Recipe
+                    </Badge>
                   </div>
 
                   {/* Enhanced Stats Grid */}

@@ -2,17 +2,48 @@ import type { Recipe } from "@/types/recipe";
 import { aiCache } from "./ai-cache";
 // Removed image generation import to save API quota
 
-// OpenRouter API configuration (GLM model)
-const OPENAI_API_KEY =
-  "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";
-const OPENAI_API_URL = "https://openrouter.ai/api/v1/chat/completions";
-
 // Gemini API configuration - PRIMARY AI SERVICE
 const GEMINI_API_KEY = "AIzaSyBP5Vd4HsD0s2ds3ZYQpSBtq5N9fgGq2rE";
 const GEMINI_API_URL =
   "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent";
 
 // 100% AI-GENERATED RECIPES - NO FALLBACKS!
+
+// Retry configuration for handling API overload
+const MAX_RETRIES = 3;
+const BASE_DELAY = 1000; // 1 second
+
+async function retryWithBackoff<T>(
+  operation: () => Promise<T>,
+  maxRetries: number = MAX_RETRIES
+): Promise<T | null> {
+  for (let attempt = 0; attempt <= maxRetries; attempt++) {
+    try {
+      return await operation();
+    } catch (error: any) {
+      const isLastAttempt = attempt === maxRetries;
+      const isRetryableError =
+        error?.status === 503 || error?.status === 429 || error?.status === 500;
+
+      if (isLastAttempt || !isRetryableError) {
+        console.error(
+          `❌ Final attempt failed (${attempt + 1}/${maxRetries + 1}):`,
+          error
+        );
+        throw error;
+      }
+
+      const delay = BASE_DELAY * Math.pow(2, attempt) + Math.random() * 1000;
+      console.log(
+        `⏳ API overloaded, retrying in ${Math.round(delay)}ms (attempt ${
+          attempt + 1
+        }/${maxRetries + 1})`
+      );
+      await new Promise((resolve) => setTimeout(resolve, delay));
+    }
+  }
+  return null;
+}
 
 export async function generateRecipe(prompt: string): Promise<Recipe | null> {
   console.log("🍳 100% AI-Generated Recipe Starting:", prompt);
@@ -51,13 +82,12 @@ async function tryAIGeneration(prompt: string): Promise<Recipe | null> {
   console.log("🔑 Gemini API Key:", GEMINI_API_KEY.substring(0, 20) + "...");
   console.log("🌐 Gemini API URL:", GEMINI_API_URL);
 
-  try {
-    const requestBody = {
-      contents: [
-        {
-          parts: [
-            {
-              text: `You are a professional chef and recipe creator. Create a detailed, delicious recipe based on this request: "${prompt}".
+  const requestBody = {
+    contents: [
+      {
+        parts: [
+          {
+            text: `You are a professional chef and recipe creator. Create a detailed, delicious recipe based on this request: "${prompt}".
 
 Respond with ONLY a JSON object in this exact format:
 {
@@ -79,18 +109,20 @@ Requirements:
 - Include 3-5 relevant tags
 - Make it sound delicious and achievable
 - Respond with ONLY the JSON object, no additional text`,
-            },
-          ],
-        },
-      ],
-      generationConfig: {
-        temperature: 0.7,
-        topK: 40,
-        topP: 0.95,
-        maxOutputTokens: 1000,
+          },
+        ],
       },
-    };
+    ],
+    generationConfig: {
+      temperature: 0.7,
+      topK: 40,
+      topP: 0.95,
+      maxOutputTokens: 1000,
+    },
+  };
 
+  // Use retry mechanism for API calls
+  const result = await retryWithBackoff(async () => {
     console.log("📤 Sending request to Gemini...");
 
     const response = await fetch(`${GEMINI_API_URL}?key=${GEMINI_API_KEY}`, {
@@ -106,10 +138,23 @@ Requirements:
     if (!response.ok) {
       const errorText = await response.text();
       console.error(`❌ GEMINI API ERROR (${response.status}):`, errorText);
-      return null;
+
+      // Throw error with status for retry logic
+      const error = new Error(`API Error: ${response.status}`);
+      (error as any).status = response.status;
+      throw error;
     }
 
-    const data = await response.json();
+    return response;
+  });
+
+  if (!result) {
+    console.error("❌ All retry attempts failed");
+    return null;
+  }
+
+  try {
+    const data = await result.json();
     console.log("📊 Full Gemini response:", JSON.stringify(data, null, 2));
 
     if (!data.candidates?.[0]?.content?.parts?.[0]?.text) {
@@ -217,15 +262,14 @@ export async function generateMealPlan(
 async function tryAIMealPlanGeneration(
   prompt: string
 ): Promise<Recipe[] | null> {
-  try {
-    console.log("🤖 Connecting to Gemini for meal plan generation...");
+  console.log("🤖 Connecting to Gemini for meal plan generation...");
 
-    const requestBody = {
-      contents: [
-        {
-          parts: [
-            {
-              text: `You are a professional chef and meal planner. Create 7 different recipes for a weekly meal plan based on: "${prompt}".
+  const requestBody = {
+    contents: [
+      {
+        parts: [
+          {
+            text: `You are a professional chef and meal planner. Create 7 different recipes for a weekly meal plan based on: "${prompt}".
 
 Respond with ONLY a JSON array of recipe objects:
 [
@@ -251,18 +295,20 @@ Requirements:
 - Difficulty must be "easy", "medium", or "hard"
 - Include 3-5 relevant tags per recipe
 - Respond with ONLY the JSON array, no additional text`,
-            },
-          ],
-        },
-      ],
-      generationConfig: {
-        temperature: 0.8,
-        topK: 40,
-        topP: 0.95,
-        maxOutputTokens: 2000,
+          },
+        ],
       },
-    };
+    ],
+    generationConfig: {
+      temperature: 0.8,
+      topK: 40,
+      topP: 0.95,
+      maxOutputTokens: 2000,
+    },
+  };
 
+  // Use retry mechanism for meal plan API calls
+  const result = await retryWithBackoff(async () => {
     console.log("📤 Sending meal plan request to Gemini...");
 
     const response = await fetch(`${GEMINI_API_URL}?key=${GEMINI_API_KEY}`, {
@@ -281,10 +327,23 @@ Requirements:
         `❌ Gemini meal plan API error (${response.status}):`,
         errorText
       );
-      return null;
+
+      // Throw error with status for retry logic
+      const error = new Error(`API Error: ${response.status}`);
+      (error as any).status = response.status;
+      throw error;
     }
 
-    const data = await response.json();
+    return response;
+  });
+
+  if (!result) {
+    console.error("❌ All meal plan retry attempts failed");
+    return null;
+  }
+
+  try {
+    const data = await result.json();
     console.log(
       "📊 Full Gemini meal plan response:",
       JSON.stringify(data, null, 2)

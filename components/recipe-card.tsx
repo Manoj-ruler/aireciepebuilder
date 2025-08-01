@@ -141,76 +141,116 @@ export default function RecipeCard({ recipe, onSave, isSaved }: RecipeCardProps)
             </div>
           </DialogHeader>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 pt-6">
-            {/* Recipe Details - Single Column Layout */}
-            <div className="space-y-6">
-              {/* Enhanced Ingredients */}
-              <div className="glass-button p-6 rounded-2xl">
-                <h3 className="text-xl font-bold text-gradient-primary mb-4 flex items-center">
-                  <ChefHat className="h-6 w-6 mr-2 animate-float" />
-                  Ingredients
-                  <div className="ml-2 bg-sky-500/20 text-sky-300 text-xs px-2 py-1 rounded-full">
-                    {recipe.ingredients.length} items
-                  </div>
-                </h3>
-                <ul className="space-y-3">
-                  {recipe.ingredients.map((ingredient, index) => (
-                    <li key={index} className="flex items-start group hover:bg-white/5 p-2 rounded-xl transition-all duration-300">
-                      <div className="w-6 h-6 bg-gradient-primary rounded-full flex items-center justify-center mr-3 flex-shrink-0 mt-0.5 group-hover:animate-pulse">
-                        <span className="text-white text-xs font-bold">{index + 1}</span>
-                      </div>
-                      <span className="text-gray-200 leading-relaxed">{ingredient}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-
-              {/* Enhanced Instructions */}
-              <div className="glass-button p-6 rounded-2xl">
-                <h3 className="text-xl font-bold text-gradient-accent mb-4 flex items-center">
-                  <Star className="h-6 w-6 mr-2 animate-glow" />
-                  Instructions
-                  <div className="ml-2 bg-amber-500/20 text-amber-300 text-xs px-2 py-1 rounded-full">
-                    {recipe.instructions.length} steps
-                  </div>
-                </h3>
-                <ol className="space-y-4">
-                  {recipe.instructions.map((instruction, index) => (
-                    <li key={index} className="flex items-start group hover:bg-white/5 p-3 rounded-xl transition-all duration-300">
-                      <div className="bg-gradient-accent text-white rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold mr-4 flex-shrink-0 mt-0.5 group-hover:animate-bounce shadow-lg">
-                        {index + 1}
-                      </div>
-                      <span className="text-gray-200 leading-relaxed">{instruction}</span>
-                    </li>
-                  ))}
-                </ol>
-              </div>
-
-              {/* Action Buttons */}
-              <div className="flex flex-col sm:flex-row gap-3">
-                <Button
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    onSave()
-                  }}
-                  className={`flex-1 transition-all duration-300 rounded-2xl py-3 font-semibold interactive-scale ${
-                    isSaved
-                      ? "bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 text-white shadow-lg hover:shadow-red-500/25"
-                      : "bg-gradient-primary hover:bg-gradient-secondary text-white shadow-lg hover:shadow-sky-500/25"
-                  }`}
-                >
-                  <Heart className={`h-4 w-4 mr-2 transition-all duration-300 ${isSaved ? "fill-current animate-heartbeat" : ""}`} />
-                  {isSaved ? "❤️ Saved" : "💝 Save Recipe"}
-                </Button>
-                <Button
-                  onClick={() => setShowDetails(false)}
-                  variant="outline"
-                  className="flex-1 glass-button border-white/20 text-white hover:bg-white/10 rounded-2xl py-3 font-semibold interactive-scale"
-                >
-                  Close
-                </Button>
-              </div>
+          {/* Recipe Stats */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6 pt-6">
+            <div className="glass-button p-4 rounded-2xl text-center group hover:bg-sky-500/10 transition-all duration-300">
+              <Clock className="h-6 w-6 text-sky-400 mx-auto mb-2 group-hover:animate-wiggle" />
+              <div className="text-lg font-bold text-white">{recipe.cookingTime}</div>
+              <div className="text-xs text-gray-400">minutes</div>
             </div>
+            <div className="glass-button p-4 rounded-2xl text-center group hover:bg-emerald-500/10 transition-all duration-300">
+              <Users className="h-6 w-6 text-emerald-400 mx-auto mb-2 group-hover:animate-wiggle" />
+              <div className="text-lg font-bold text-white">{recipe.servings}</div>
+              <div className="text-xs text-gray-400">servings</div>
+            </div>
+            <div className="glass-button p-4 rounded-2xl text-center group hover:bg-amber-500/10 transition-all duration-300">
+              <Star className="h-6 w-6 text-amber-400 mx-auto mb-2 group-hover:animate-wiggle" />
+              <div className="text-lg font-bold text-white capitalize">{recipe.difficulty}</div>
+              <div className="text-xs text-gray-400">difficulty</div>
+            </div>
+            <div className="glass-button p-4 rounded-2xl text-center group hover:bg-purple-500/10 transition-all duration-300">
+              <ChefHat className="h-6 w-6 text-purple-400 mx-auto mb-2 group-hover:animate-wiggle" />
+              <div className="text-lg font-bold text-white">{recipe.tags.length}</div>
+              <div className="text-xs text-gray-400">tags</div>
+            </div>
+          </div>
+
+          {/* Side-by-Side Layout for Ingredients and Instructions */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Left Column - Ingredients */}
+            <div className="glass-button p-6 rounded-2xl">
+              <h3 className="text-xl font-bold text-gradient-primary mb-4 flex items-center">
+                <ChefHat className="h-6 w-6 mr-2 animate-float" />
+                Ingredients
+                <div className="ml-2 bg-sky-500/20 text-sky-300 text-xs px-2 py-1 rounded-full">
+                  {recipe.ingredients.length} items
+                </div>
+              </h3>
+              <ul className="space-y-3">
+                {recipe.ingredients.map((ingredient, index) => (
+                  <li key={index} className="flex items-start group hover:bg-white/5 p-2 rounded-xl transition-all duration-300">
+                    <div className="w-6 h-6 bg-gradient-primary rounded-full flex items-center justify-center mr-3 flex-shrink-0 mt-0.5 group-hover:animate-pulse">
+                      <span className="text-white text-xs font-bold">{index + 1}</span>
+                    </div>
+                    <span className="text-gray-200 leading-relaxed">{ingredient}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Right Column - Instructions */}
+            <div className="glass-button p-6 rounded-2xl">
+              <h3 className="text-xl font-bold text-gradient-accent mb-4 flex items-center">
+                <Star className="h-6 w-6 mr-2 animate-glow" />
+                Instructions
+                <div className="ml-2 bg-amber-500/20 text-amber-300 text-xs px-2 py-1 rounded-full">
+                  {recipe.instructions.length} steps
+                </div>
+              </h3>
+              <ol className="space-y-4">
+                {recipe.instructions.map((instruction, index) => (
+                  <li key={index} className="flex items-start group hover:bg-white/5 p-3 rounded-xl transition-all duration-300">
+                    <div className="bg-gradient-accent text-white rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold mr-4 flex-shrink-0 mt-0.5 group-hover:animate-bounce shadow-lg">
+                      {index + 1}
+                    </div>
+                    <span className="text-gray-200 leading-relaxed">{instruction}</span>
+                  </li>
+                ))}
+              </ol>
+            </div>
+          </div>
+
+          {/* Tags Section */}
+          <div className="glass-button p-6 rounded-2xl mt-6">
+            <h3 className="text-lg font-bold text-gradient-secondary mb-4 flex items-center">
+              <Sparkles className="h-5 w-5 mr-2 animate-pulse" />
+              Recipe Tags
+            </h3>
+            <div className="flex flex-wrap gap-2">
+              {recipe.tags.map((tag, index) => (
+                <Badge 
+                  key={index} 
+                  className="bg-gradient-to-r from-sky-500/20 to-emerald-500/20 text-sky-300 border-sky-400/30 hover:from-sky-500/30 hover:to-emerald-500/30 transition-all duration-300 px-3 py-2 rounded-full interactive-scale"
+                >
+                  #{tag}
+                </Badge>
+              ))}
+            </div>
+          </div>
+
+          {/* Action Buttons */}
+          <div className="flex flex-col sm:flex-row gap-3 mt-6">
+            <Button
+              onClick={(e) => {
+                e.stopPropagation()
+                onSave()
+              }}
+              className={`flex-1 transition-all duration-300 rounded-2xl py-3 font-semibold interactive-scale ${
+                isSaved
+                  ? "bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 text-white shadow-lg hover:shadow-red-500/25"
+                  : "bg-gradient-primary hover:bg-gradient-secondary text-white shadow-lg hover:shadow-sky-500/25"
+              }`}
+            >
+              <Heart className={`h-4 w-4 mr-2 transition-all duration-300 ${isSaved ? "fill-current animate-heartbeat" : ""}`} />
+              {isSaved ? "❤️ Saved" : "💝 Save Recipe"}
+            </Button>
+            <Button
+              onClick={() => setShowDetails(false)}
+              variant="outline"
+              className="flex-1 glass-button border-white/20 text-white hover:bg-white/10 rounded-2xl py-3 font-semibold interactive-scale"
+            >
+              Close
+            </Button>
           </div>
         </DialogContent>
       </Dialog>

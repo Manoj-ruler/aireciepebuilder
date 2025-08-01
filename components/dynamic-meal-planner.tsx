@@ -71,6 +71,8 @@ export default function DynamicMealPlanner({ onAddMealPlan, existingPlans }: Dyn
   const [planFeedback, setPlanFeedback] = useState<PlanFeedback[]>([])
   const [activeTab, setActiveTab] = useState("constraints")
   const [estimatedCost, setEstimatedCost] = useState(0)
+  const [showSmartRecipeModal, setShowSmartRecipeModal] = useState(false)
+  const [selectedSmartRecipe, setSelectedSmartRecipe] = useState<Recipe | null>(null)
   const { toast } = useToast()
 
   const [constraints, setConstraints] = useState<PlanConstraints>({
@@ -881,19 +883,19 @@ export default function DynamicMealPlanner({ onAddMealPlan, existingPlans }: Dyn
                   {isGenerating ? (
                     <div className="text-center py-12">
                       <Loader2 className="h-12 w-12 animate-spin text-purple-500 mx-auto mb-4" />
-                      <h3 className="text-xl font-semibold text-white mb-2">Generating Your Dynamic Plan...</h3>
+                      <h3 className="text-xl font-semibold text-gray-900 mb-2">Generating Your Dynamic Plan...</h3>
                       <p className="text-gray-400">AI is creating personalized recipes based on your constraints</p>
                       <div className="mt-4 text-sm text-gray-500">This may take a few moments...</div>
                     </div>
                   ) : currentPlan.length > 0 ? (
                     <div className="space-y-6">
                       {/* Plan Summary */}
-                      <Card className="bg-gradient-to-r from-green-900 to-blue-900 border-green-700">
+                      <Card className="bg-gradient-to-r from-green-50 to-blue-50 border-green-200">
                         <CardContent className="p-4">
                           <div className="flex items-center justify-between">
                             <div>
-                              <h3 className="text-lg font-semibold text-white">Your Dynamic Meal Plan</h3>
-                              <p className="text-green-200 text-sm">
+                              <h3 className="text-lg font-semibold text-gray-900">Your Dynamic Meal Plan</h3>
+                              <p className="text-green-700 text-sm">
                                 {currentPlan.length} recipes • Estimated cost: ${estimatedCost.toFixed(2)}
                               </p>
                             </div>
@@ -903,7 +905,7 @@ export default function DynamicMealPlanner({ onAddMealPlan, existingPlans }: Dyn
                                 disabled={isAdjusting}
                                 variant="outline"
                                 size="sm"
-                                className="border-green-600 text-green-200 hover:bg-green-800"
+                                className="border-purple-500 text-purple-300 hover:bg-purple-600 hover:text-white bg-purple-500/10"
                               >
                                 {isAdjusting ? (
                                   <Loader2 className="mr-2 h-3 w-3 animate-spin" />
@@ -931,7 +933,11 @@ export default function DynamicMealPlanner({ onAddMealPlan, existingPlans }: Dyn
                           return (
                             <Card
                               key={recipe.id}
-                              className="bg-gray-700 border-gray-600 hover:border-gray-500 transition-colors"
+                              className="bg-white/95 backdrop-blur-sm border border-gray-200/50 hover:border-sky-400/50 transition-all duration-300 cursor-pointer hover:shadow-lg"
+                              onClick={() => {
+                                setSelectedSmartRecipe(recipe)
+                                setShowSmartRecipeModal(true)
+                              }}
                             >
                               <CardContent className="p-4">
                                 <div className="flex items-start justify-between">
@@ -953,7 +959,7 @@ export default function DynamicMealPlanner({ onAddMealPlan, existingPlans }: Dyn
                                         {recipe.difficulty}
                                       </Badge>
                                     </div>
-                                    <h4 className="font-semibold text-white text-lg">{recipe.title}</h4>
+                                    <h4 className="font-semibold text-gray-900 text-lg">{recipe.title}</h4>
                                     <p className="text-gray-400 text-sm mt-1 line-clamp-2">{recipe.description}</p>
                                     <div className="flex items-center gap-4 mt-3 text-xs text-gray-500">
                                       <span className="flex items-center">
@@ -1017,9 +1023,9 @@ export default function DynamicMealPlanner({ onAddMealPlan, existingPlans }: Dyn
 
                       {/* Adjustment Options */}
                       {planFeedback.length > 0 && (
-                        <Card className="bg-blue-900 border-blue-700">
+                        <Card className="bg-blue-50 border-blue-200">
                           <CardContent className="p-4">
-                            <h4 className="font-semibold text-white mb-3 flex items-center">
+                            <h4 className="font-semibold text-gray-900 mb-3 flex items-center">
                               <Star className="mr-2 h-4 w-4" />
                               Smart Adjustment Options
                             </h4>
@@ -1082,6 +1088,98 @@ export default function DynamicMealPlanner({ onAddMealPlan, existingPlans }: Dyn
           </Dialog>
         </CardContent>
       </Card>
+
+      {/* Smart Recipe Modal */}
+      <Dialog open={showSmartRecipeModal} onOpenChange={setShowSmartRecipeModal}>
+        <DialogContent className="bg-white/95 backdrop-blur-xl border border-gray-200/50 text-gray-900 max-w-4xl max-h-[90vh] overflow-y-auto rounded-3xl shadow-2xl">
+          <DialogHeader className="pb-6 border-b border-gray-200">
+            <DialogTitle className="text-2xl md:text-3xl font-bold text-gray-900">
+              {selectedSmartRecipe?.title}
+            </DialogTitle>
+            <DialogDescription className="text-gray-600 text-base md:text-lg mt-2">
+              {selectedSmartRecipe?.description}
+            </DialogDescription>
+          </DialogHeader>
+
+          {selectedSmartRecipe && (
+            <div className="space-y-6">
+              {/* Recipe Info */}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div className="text-center p-3 bg-blue-50 rounded-xl">
+                  <Clock className="h-6 w-6 text-blue-600 mx-auto mb-2" />
+                  <div className="text-sm font-semibold text-blue-700">{selectedSmartRecipe.cookingTime} min</div>
+                </div>
+                <div className="text-center p-3 bg-green-50 rounded-xl">
+                  <Users className="h-6 w-6 text-green-600 mx-auto mb-2" />
+                  <div className="text-sm font-semibold text-green-700">{selectedSmartRecipe.servings} servings</div>
+                </div>
+                <div className="text-center p-3 bg-purple-50 rounded-xl">
+                  <ChefHat className="h-6 w-6 text-purple-600 mx-auto mb-2" />
+                  <div className="text-sm font-semibold text-purple-700 capitalize">{selectedSmartRecipe.difficulty}</div>
+                </div>
+                <div className="text-center p-3 bg-amber-50 rounded-xl">
+                  <DollarSign className="h-6 w-6 text-amber-600 mx-auto mb-2" />
+                  <div className="text-sm font-semibold text-amber-700">${((selectedSmartRecipe as any).estimatedCost || 8).toFixed(2)}</div>
+                </div>
+              </div>
+
+              {/* Tags */}
+              <div className="flex flex-wrap gap-2">
+                {selectedSmartRecipe.tags.map((tag, index) => (
+                  <Badge key={index} variant="secondary" className="bg-gray-100 text-gray-700">
+                    {tag}
+                  </Badge>
+                ))}
+              </div>
+
+              {/* Ingredients and Instructions - Side by Side on Desktop */}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {/* Ingredients */}
+                <Card className="bg-white/95 backdrop-blur-sm border border-gray-200/50 shadow-sm">
+                  <CardHeader>
+                    <CardTitle className="text-lg font-bold text-gray-900 flex items-center">
+                      <ShoppingCart className="mr-2 h-5 w-5 text-green-600" />
+                      Ingredients
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <ul className="space-y-2">
+                      {selectedSmartRecipe.ingredients.map((ingredient, index) => (
+                        <li key={index} className="flex items-start">
+                          <span className="inline-block w-2 h-2 bg-green-500 rounded-full mt-2 mr-3 flex-shrink-0"></span>
+                          <span className="text-gray-700">{ingredient}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </CardContent>
+                </Card>
+
+                {/* Instructions */}
+                <Card className="bg-white/95 backdrop-blur-sm border border-gray-200/50 shadow-sm">
+                  <CardHeader>
+                    <CardTitle className="text-lg font-bold text-gray-900 flex items-center">
+                      <ChefHat className="mr-2 h-5 w-5 text-blue-600" />
+                      Instructions
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <ol className="space-y-3">
+                      {selectedSmartRecipe.instructions.map((instruction, index) => (
+                        <li key={index} className="flex items-start">
+                          <span className="inline-flex items-center justify-center w-6 h-6 bg-blue-500 text-white text-sm font-bold rounded-full mr-3 flex-shrink-0 mt-0.5">
+                            {index + 1}
+                          </span>
+                          <span className="text-gray-700">{instruction}</span>
+                        </li>
+                      ))}
+                    </ol>
+                  </CardContent>
+                </Card>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }
