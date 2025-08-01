@@ -33,6 +33,8 @@ import {
   Edit3,
   Users,
   Star,
+  Youtube,
+  ExternalLink,
 } from "lucide-react"
 import type { Recipe, MealPlan } from "@/types/recipe"
 import { generateDynamicMealPlan, adjustMealPlan } from "@/lib/dynamic-ai-service-new"
@@ -403,6 +405,13 @@ export default function DynamicMealPlanner({ onAddMealPlan, existingPlans }: Dyn
     setCustomPrompt("")
   }
 
+  // Generate YouTube search URL for the recipe
+  const getYouTubeSearchUrl = (recipeTitle: string) => {
+    const searchQuery = `${recipeTitle} recipe cooking tutorial`
+    const encodedQuery = encodeURIComponent(searchQuery)
+    return `https://www.youtube.com/results?search_query=${encodedQuery}`
+  }
+
   const totalMeals = constraints.days * constraints.mealTypes.length
 
   return (
@@ -475,7 +484,7 @@ export default function DynamicMealPlanner({ onAddMealPlan, existingPlans }: Dyn
               </Button>
             </DialogTrigger>
             
-            <DialogContent className="bg-white/95 backdrop-blur-xl border border-gray-200/50 text-gray-900 max-w-6xl max-h-[90vh] overflow-y-auto rounded-3xl shadow-2xl animate-scale-in">
+            <DialogContent className="bg-white/95 backdrop-blur-xl border border-gray-200/50 text-gray-900 max-w-6xl w-[95vw] sm:w-full max-h-[90vh] overflow-y-auto rounded-3xl shadow-2xl animate-scale-in mx-4 sm:mx-auto">
               <DialogHeader className="pb-6 border-b border-gray-200">
                 <div className="flex items-center justify-between">
                   <div>
@@ -1131,6 +1140,29 @@ export default function DynamicMealPlanner({ onAddMealPlan, existingPlans }: Dyn
                   </Badge>
                 ))}
               </div>
+
+              {/* YouTube Source Link Section */}
+              <Card className="bg-white/95 backdrop-blur-sm border border-gray-200/50 shadow-sm">
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-center mb-4">
+                    <Youtube className="h-6 w-6 text-red-500 mr-2 animate-pulse" />
+                    <h3 className="text-lg font-bold text-gray-900">Video Tutorial</h3>
+                  </div>
+                  <a
+                    href={getYouTubeSearchUrl(selectedSmartRecipe?.title || '')}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center justify-center w-full bg-gradient-to-r from-red-600 to-red-500 hover:from-red-700 hover:to-red-600 text-white py-3 px-6 rounded-2xl font-bold text-base transition-all duration-300 interactive-scale shadow-lg hover:shadow-red-500/25"
+                  >
+                    <Youtube className="h-5 w-5 mr-3 animate-pulse" />
+                    <span className="font-bold">Source Link - Watch on YouTube</span>
+                    <ExternalLink className="h-4 w-4 ml-3" />
+                  </a>
+                  <p className="text-xs text-gray-500 mt-2 text-center">
+                    Find step-by-step video tutorials for this recipe
+                  </p>
+                </CardContent>
+              </Card>
 
               {/* Ingredients and Instructions - Side by Side on Desktop */}
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

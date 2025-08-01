@@ -108,6 +108,7 @@ Requirements:
 - Difficulty must be "easy", "medium", or "hard"
 - Include 3-5 relevant tags
 - Make it sound delicious and achievable
+- Add YouTube tutorial links for visual cooking guidance
 - Respond with ONLY the JSON object, no additional text`,
           },
         ],

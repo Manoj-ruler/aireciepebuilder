@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { Heart, Clock, Users, Star, ChefHat, Sparkles } from "lucide-react"
+import { Heart, Clock, Users, Star, ChefHat, Sparkles, Youtube, ExternalLink } from "lucide-react"
 import type { Recipe } from "@/types/recipe"
 
 interface RecipeCardProps {
@@ -32,9 +32,16 @@ export default function RecipeCard({ recipe, onSave, isSaved }: RecipeCardProps)
     }
   }
 
+  // Generate YouTube search URL for the recipe
+  const getYouTubeSearchUrl = (recipeTitle: string) => {
+    const searchQuery = `${recipeTitle} recipe cooking tutorial`
+    const encodedQuery = encodeURIComponent(searchQuery)
+    return `https://www.youtube.com/results?search_query=${encodedQuery}`
+  }
+
   return (
     <>
-      <Card className="glass-card backdrop-blur-xl border-white/10 hover:border-sky-400/50 transition-all duration-500 transform hover:scale-[1.02] hover:shadow-2xl cursor-pointer group relative overflow-hidden animate-slide-in-up">
+      <Card className="glass-card backdrop-blur-xl border-white/10 hover:border-sky-400/50 transition-all duration-500 transform hover:scale-[1.02] hover:shadow-2xl cursor-pointer group relative overflow-hidden animate-slide-in-up w-full">
         {/* Shimmer effect */}
         <div className="absolute inset-0 -translate-x-full animate-shimmer bg-gradient-to-r from-transparent via-white/5 to-transparent group-hover:translate-x-full transition-transform duration-1000"></div>
         
@@ -98,6 +105,21 @@ export default function RecipeCard({ recipe, onSave, isSaved }: RecipeCardProps)
                 </Badge>
               )}
             </div>
+
+            {/* YouTube Source Link */}
+            <div className="mb-4">
+              <a
+                href={getYouTubeSearchUrl(recipe.title)}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={(e) => e.stopPropagation()}
+                className="flex items-center justify-center w-full bg-gradient-to-r from-red-600 to-red-500 hover:from-red-700 hover:to-red-600 text-white py-2.5 px-4 rounded-2xl font-bold text-sm transition-all duration-300 interactive-scale shadow-lg hover:shadow-red-500/25"
+              >
+                <Youtube className="h-4 w-4 mr-2 animate-pulse" />
+                <span className="font-bold">Source Link</span>
+                <ExternalLink className="h-3 w-3 ml-2" />
+              </a>
+            </div>
           </div>
         </div>
 
@@ -121,7 +143,7 @@ export default function RecipeCard({ recipe, onSave, isSaved }: RecipeCardProps)
       </Card>
 
       <Dialog open={showDetails} onOpenChange={setShowDetails}>
-        <DialogContent className="glass-card backdrop-blur-2xl border-white/10 text-white max-w-6xl max-h-[90vh] overflow-y-auto rounded-3xl animate-scale-in">
+        <DialogContent className="glass-card backdrop-blur-2xl border-white/10 text-white max-w-6xl w-[95vw] sm:w-full max-h-[90vh] overflow-y-auto rounded-3xl animate-scale-in mx-4 sm:mx-auto">
           <DialogHeader className="pb-6 border-b border-white/10">
             <div className="flex items-start justify-between">
               <div className="flex-1">
@@ -208,6 +230,27 @@ export default function RecipeCard({ recipe, onSave, isSaved }: RecipeCardProps)
                 ))}
               </ol>
             </div>
+          </div>
+
+          {/* YouTube Source Link Section */}
+          <div className="glass-button p-6 rounded-2xl mt-6">
+            <h3 className="text-lg font-bold text-gradient-secondary mb-4 flex items-center">
+              <Youtube className="h-5 w-5 mr-2 animate-pulse text-red-400" />
+              Video Tutorial
+            </h3>
+            <a
+              href={getYouTubeSearchUrl(recipe.title)}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center justify-center w-full bg-gradient-to-r from-red-600 to-red-500 hover:from-red-700 hover:to-red-600 text-white py-3 px-6 rounded-2xl font-bold text-base transition-all duration-300 interactive-scale shadow-lg hover:shadow-red-500/25"
+            >
+              <Youtube className="h-5 w-5 mr-3 animate-pulse" />
+              <span className="font-bold">Source Link - Watch on YouTube</span>
+              <ExternalLink className="h-4 w-4 ml-3" />
+            </a>
+            <p className="text-xs text-gray-400 mt-2 text-center">
+              Find step-by-step video tutorials for this recipe
+            </p>
           </div>
 
           {/* Tags Section */}

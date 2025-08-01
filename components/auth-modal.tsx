@@ -175,7 +175,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="bg-gray-800 border-gray-700 text-white max-w-md">
+      <DialogContent className="bg-gray-800 border-gray-700 text-white max-w-md w-[95vw] sm:w-full mx-4 sm:mx-auto rounded-3xl">
         <DialogHeader>
           <DialogTitle className="text-2xl font-bold text-center">Welcome to AI Recipe Builder</DialogTitle>
           <DialogDescription className="text-gray-400 text-center">

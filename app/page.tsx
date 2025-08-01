@@ -220,38 +220,39 @@ function HomePageContent() {
 
       {/* Enhanced Header */}
       {user && (
-        <header className="relative z-10 glass-card backdrop-blur-xl border-b border-white/10 px-4 py-6 animate-slide-in-up">
+        <header className="relative z-10 glass-card backdrop-blur-xl border-b border-white/10 px-4 py-4 md:py-6 animate-slide-in-up">
           <div className="max-w-7xl mx-auto flex items-center justify-between">
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-3 md:space-x-4">
               <div className="animate-float">
                 <div className="relative">
-                  <ChefHat className="h-10 w-10 text-sky-400 animate-glow" />
-                  <div className="absolute -top-1 -right-1 w-4 h-4 bg-gradient-primary rounded-full animate-pulse"></div>
+                  <ChefHat className="h-8 w-8 md:h-10 md:w-10 text-sky-400 animate-glow" />
+                  <div className="absolute -top-1 -right-1 w-3 h-3 md:w-4 md:h-4 bg-gradient-primary rounded-full animate-pulse"></div>
                 </div>
               </div>
               <div>
-                <h1 className="text-2xl font-bold text-gradient-primary text-shadow">
+                <h1 className="text-lg md:text-2xl font-bold text-gradient-primary text-shadow">
                   AI Recipe Builder
                 </h1>
-                <p className="text-sm text-sky-600/80 font-medium">Powered by Advanced AI</p>
+                <p className="text-xs md:text-sm text-sky-600/80 font-medium">Powered by Advanced AI</p>
               </div>
             </div>
-            <div className="flex items-center gap-4">
-              <div className="hidden md:flex items-center gap-3 glass-button px-4 py-2 rounded-2xl">
-                <div className="w-8 h-8 bg-gradient-primary rounded-full flex items-center justify-center">
-                  <User className="h-4 w-4 text-white" />
+            <div className="flex items-center gap-2 md:gap-4">
+              <div className="hidden lg:flex items-center gap-3 glass-button px-3 md:px-4 py-2 rounded-2xl">
+                <div className="w-6 h-6 md:w-8 md:h-8 bg-gradient-primary rounded-full flex items-center justify-center">
+                  <User className="h-3 w-3 md:h-4 md:w-4 text-white" />
                 </div>
                 <div className="text-left">
-                  <p className="text-sm font-semibold text-sky-700">Welcome back!</p>
-                  <p className="text-xs text-sky-600 truncate max-w-32">{user.email}</p>
+                  <p className="text-xs md:text-sm font-semibold text-sky-700">Welcome back!</p>
+                  <p className="text-xs text-sky-600 truncate max-w-24 md:max-w-32">{user.email}</p>
                 </div>
               </div>
               <Button
                 onClick={handleSignOut}
-                className="glass-button hover:bg-red-500/20 border-red-200/30 text-red-600 hover:text-red-700 transition-all duration-300 rounded-2xl px-6 py-3 interactive-scale"
+                className="glass-button hover:bg-red-500/20 border-red-200/30 text-red-600 hover:text-red-700 transition-all duration-300 rounded-2xl px-3 md:px-6 py-2 md:py-3 interactive-scale text-sm md:text-base"
               >
-                <LogOut className="h-4 w-4 mr-2" />
+                <LogOut className="h-4 w-4 mr-1 md:mr-2" />
                 <span className="hidden sm:inline">Sign Out</span>
+                <span className="sm:hidden">Out</span>
               </Button>
             </div>
           </div>
@@ -416,18 +417,18 @@ function HomePageContent() {
       {/* Scroll Down CTA - appears after recipe creation */}
       {showScrollCTA && user && (
         <div className="relative z-20 max-w-4xl mx-auto px-4 -mt-4 mb-8 animate-slide-in-up">
-          <div className="glass-card backdrop-blur-xl border border-emerald-200/50 bg-gradient-to-r from-emerald-50/80 to-teal-50/80 p-6 rounded-3xl shadow-lg">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-4">
-                <div className="w-12 h-12 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-full flex items-center justify-center animate-bounce">
-                  <ChefHat className="h-6 w-6 text-white" />
+          <div className="glass-card backdrop-blur-xl border border-emerald-200/50 bg-gradient-to-r from-emerald-50/80 to-teal-50/80 p-4 md:p-6 rounded-3xl shadow-lg">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+              <div className="flex items-center space-x-3 md:space-x-4">
+                <div className="w-10 h-10 md:w-12 md:h-12 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-full flex items-center justify-center animate-bounce flex-shrink-0">
+                  <ChefHat className="h-5 w-5 md:h-6 md:w-6 text-white" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-bold text-emerald-800">🎉 Recipe Created Successfully!</h3>
-                  <p className="text-emerald-700 font-medium">Your new recipe is ready to view below</p>
+                  <h3 className="text-base md:text-lg font-bold text-emerald-800">🎉 Recipe Created Successfully!</h3>
+                  <p className="text-sm md:text-base text-emerald-700 font-medium">Your new recipe is ready to view below</p>
                 </div>
               </div>
-              <div className="flex items-center space-x-3">
+              <div className="flex items-center space-x-2 md:space-x-3 w-full sm:w-auto">
                 <Button
                   onClick={() => {
                     // Switch to recipes tab using state
@@ -448,7 +449,7 @@ function HomePageContent() {
                       }
                     }, 200);
                   }}
-                  className="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white px-6 py-3 rounded-2xl font-semibold shadow-lg hover:shadow-xl transition-all duration-300 interactive-scale"
+                  className="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white px-4 md:px-6 py-2 md:py-3 rounded-2xl font-semibold shadow-lg hover:shadow-xl transition-all duration-300 interactive-scale text-sm md:text-base flex-1 sm:flex-none"
                 >
                   👀 View Recipe
                   <div className="ml-2 animate-bounce">⬇️</div>
@@ -457,7 +458,7 @@ function HomePageContent() {
                   onClick={() => setShowScrollCTA(false)}
                   variant="ghost"
                   size="sm"
-                  className="text-emerald-600 hover:text-emerald-700 hover:bg-emerald-100 rounded-full p-2"
+                  className="text-emerald-600 hover:text-emerald-700 hover:bg-emerald-100 rounded-full p-2 flex-shrink-0"
                 >
                   ✕
                 </Button>
@@ -479,35 +480,35 @@ function HomePageContent() {
 
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full animate-slide-in-up" id="main-tabs">
             {/* Enhanced Clean Tab Navigation */}
-            <div className="bg-white/95 backdrop-blur-sm border border-gray-200/50 rounded-2xl p-1 mb-8 shadow-sm">
-              <TabsList className="grid w-full grid-cols-1 md:grid-cols-3 bg-transparent gap-1 p-0">
+            <div className="bg-white/95 backdrop-blur-sm border border-gray-200/50 rounded-2xl p-1 mb-6 md:mb-8 shadow-sm">
+              <TabsList className="grid w-full grid-cols-3 bg-transparent gap-1 p-0">
                 <TabsTrigger
                   value="recipes"
-                  className="data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow-sm text-gray-600 hover:text-gray-900 rounded-xl font-semibold py-4 px-6 transition-all duration-300 flex items-center justify-center space-x-2 text-sm md:text-base"
+                  className="data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow-sm text-gray-600 hover:text-gray-900 rounded-xl font-semibold py-3 md:py-4 px-2 md:px-6 transition-all duration-300 flex items-center justify-center space-x-1 md:space-x-2 text-xs md:text-base"
                 >
-                  <ChefHat className="h-4 w-4" />
+                  <ChefHat className="h-4 w-4 flex-shrink-0" />
                   <span className="hidden sm:inline">My Recipes</span>
                   <span className="sm:hidden">Recipes</span>
-                  <div className="ml-2 bg-emerald-100 text-emerald-700 text-xs px-2 py-1 rounded-full font-bold min-w-[24px] text-center">
+                  <div className="ml-1 md:ml-2 bg-emerald-100 text-emerald-700 text-xs px-1.5 md:px-2 py-0.5 md:py-1 rounded-full font-bold min-w-[20px] md:min-w-[24px] text-center">
                     {recipes.length}
                   </div>
                 </TabsTrigger>
                 <TabsTrigger
                   value="saved"
-                  className="data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow-sm text-gray-600 hover:text-gray-900 rounded-xl font-semibold py-4 px-6 transition-all duration-300 flex items-center justify-center space-x-2 text-sm md:text-base"
+                  className="data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow-sm text-gray-600 hover:text-gray-900 rounded-xl font-semibold py-3 md:py-4 px-2 md:px-6 transition-all duration-300 flex items-center justify-center space-x-1 md:space-x-2 text-xs md:text-base"
                 >
-                  <Heart className="h-4 w-4" />
+                  <Heart className="h-4 w-4 flex-shrink-0" />
                   <span className="hidden sm:inline">Saved</span>
                   <span className="sm:hidden">Saved</span>
-                  <div className="ml-2 bg-pink-100 text-pink-700 text-xs px-2 py-1 rounded-full font-bold min-w-[24px] text-center">
+                  <div className="ml-1 md:ml-2 bg-pink-100 text-pink-700 text-xs px-1.5 md:px-2 py-0.5 md:py-1 rounded-full font-bold min-w-[20px] md:min-w-[24px] text-center">
                     {savedRecipes.length}
                   </div>
                 </TabsTrigger>
                 <TabsTrigger
                   value="meal-plan"
-                  className="data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow-sm text-gray-600 hover:text-gray-900 rounded-xl font-semibold py-4 px-6 transition-all duration-300 flex items-center justify-center space-x-2 text-sm md:text-base"
+                  className="data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow-sm text-gray-600 hover:text-gray-900 rounded-xl font-semibold py-3 md:py-4 px-2 md:px-6 transition-all duration-300 flex items-center justify-center space-x-1 md:space-x-2 text-xs md:text-base"
                 >
-                  <Calendar className="h-4 w-4" />
+                  <Calendar className="h-4 w-4 flex-shrink-0" />
                   <span className="hidden sm:inline">Meal Plan</span>
                   <span className="sm:hidden">Plan</span>
                 </TabsTrigger>
