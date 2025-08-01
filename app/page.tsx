@@ -49,6 +49,9 @@ function HomePageContent() {
     addRecipe,
     saveRecipe,
     addMealPlan,
+    setCurrentUser,
+    loadUserData,
+    clearAll,
   } = useRecipeStore();
 
   const [aiPrompt, setAiPrompt] = useState("");
@@ -69,7 +72,20 @@ function HomePageContent() {
     tags: [],
   });
 
-  // No need to fetch data - everything is stored in frontend now!
+  // Handle user authentication and load/save user-specific data
+  useEffect(() => {
+    if (user?.email) {
+      console.log("👤 User logged in:", user.email);
+      // Set current user and load their data
+      setCurrentUser(user.email);
+      loadUserData(user.email);
+    } else if (!loading) {
+      console.log("👤 User logged out");
+      // Clear data when user logs out
+      setCurrentUser(null);
+      clearAll();
+    }
+  }, [user, loading, setCurrentUser, loadUserData, clearAll]);
 
   if (loading) {
     return <LoadingScreen />;

@@ -455,38 +455,38 @@ export default function DynamicMealPlanner({ onAddMealPlan, existingPlans }: Dyn
               </DialogHeader>
 
               <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-                <TabsList className="grid w-full grid-cols-3 bg-gray-700">
-                  <TabsTrigger value="constraints" className="data-[state=active]:bg-purple-600">
+                <TabsList className="grid w-full grid-cols-3 bg-white/95 backdrop-blur-sm border border-gray-200/50 rounded-2xl p-1">
+                  <TabsTrigger value="constraints" className="data-[state=active]:bg-purple-600 data-[state=active]:text-white text-gray-700 hover:text-gray-900 rounded-xl font-semibold py-3 px-4 transition-all duration-300">
                     Constraints
                   </TabsTrigger>
-                  <TabsTrigger value="custom" className="data-[state=active]:bg-purple-600">
+                  <TabsTrigger value="custom" className="data-[state=active]:bg-purple-600 data-[state=active]:text-white text-gray-700 hover:text-gray-900 rounded-xl font-semibold py-3 px-4 transition-all duration-300">
                     Custom Prompt
                   </TabsTrigger>
-                  <TabsTrigger value="results" className="data-[state=active]:bg-purple-600">
+                  <TabsTrigger value="results" className="data-[state=active]:bg-purple-600 data-[state=active]:text-white text-gray-700 hover:text-gray-900 rounded-xl font-semibold py-3 px-4 transition-all duration-300">
                     Results {currentPlan.length > 0 && `(${currentPlan.length})`}
                   </TabsTrigger>
                 </TabsList>
 
                 <TabsContent value="constraints" className="space-y-6">
                   {/* Summary Card */}
-                  <Card className="bg-gray-700 border-gray-600">
+                  <Card className="bg-white/95 backdrop-blur-sm border border-gray-200/50 shadow-sm">
                     <CardContent className="p-4">
                       <div className="flex items-center justify-between text-sm">
                         <div className="flex items-center gap-4">
-                          <span className="text-gray-300">
-                            <DollarSign className="inline h-4 w-4 mr-1" />
+                          <span className="text-gray-700 font-semibold">
+                            <DollarSign className="inline h-4 w-4 mr-1 text-green-600" />
                             Budget: ${constraints.budget}
                           </span>
-                          <span className="text-gray-300">
-                            <Clock className="inline h-4 w-4 mr-1" />
+                          <span className="text-gray-700 font-semibold">
+                            <Clock className="inline h-4 w-4 mr-1 text-blue-600" />
                             Max Time: {constraints.maxCookingTime}m
                           </span>
-                          <span className="text-gray-300">
-                            <Users className="inline h-4 w-4 mr-1" />
+                          <span className="text-gray-700 font-semibold">
+                            <Users className="inline h-4 w-4 mr-1 text-purple-600" />
                             Total Meals: {totalMeals}
                           </span>
                         </div>
-                        <Badge variant="outline" className="text-purple-300 border-purple-500">
+                        <Badge variant="outline" className="text-purple-700 border-purple-400 bg-purple-50">
                           {constraints.skillLevel}
                         </Badge>
                       </div>
@@ -495,16 +495,16 @@ export default function DynamicMealPlanner({ onAddMealPlan, existingPlans }: Dyn
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {/* Budget & Time */}
-                    <Card className="bg-gray-700 border-gray-600">
+                    <Card className="bg-white/95 backdrop-blur-sm border border-gray-200/50 shadow-sm">
                       <CardHeader>
-                        <CardTitle className="text-sm flex items-center">
-                          <DollarSign className="mr-2 h-4 w-4" />
+                        <CardTitle className="text-sm flex items-center text-gray-900">
+                          <DollarSign className="mr-2 h-4 w-4 text-green-600" />
                           Budget & Time
                         </CardTitle>
                       </CardHeader>
                       <CardContent className="space-y-4">
                         <div>
-                          <Label>Budget: ${constraints.budget}</Label>
+                          <Label className="text-gray-700 font-semibold">Budget: ${constraints.budget}</Label>
                           <Slider
                             value={[constraints.budget]}
                             onValueChange={(value) => setConstraints((prev) => ({ ...prev, budget: value[0] }))}
@@ -520,7 +520,7 @@ export default function DynamicMealPlanner({ onAddMealPlan, existingPlans }: Dyn
                           </div>
                         </div>
                         <div>
-                          <Label>Max Cooking Time: {constraints.maxCookingTime} minutes</Label>
+                          <Label className="text-gray-700 font-semibold">Max Cooking Time: {constraints.maxCookingTime} minutes</Label>
                           <Slider
                             value={[constraints.maxCookingTime]}
                             onValueChange={(value) => setConstraints((prev) => ({ ...prev, maxCookingTime: value[0] }))}
@@ -559,16 +559,16 @@ export default function DynamicMealPlanner({ onAddMealPlan, existingPlans }: Dyn
                     </Card>
 
                     {/* Meal Types & Skill */}
-                    <Card className="bg-gray-700 border-gray-600">
+                    <Card className="bg-white/95 backdrop-blur-sm border border-gray-200/50 shadow-sm">
                       <CardHeader>
-                        <CardTitle className="text-sm flex items-center">
-                          <Clock className="mr-2 h-4 w-4" />
+                        <CardTitle className="text-sm flex items-center text-gray-900">
+                          <Clock className="mr-2 h-4 w-4 text-blue-600" />
                           Meals & Skill Level
                         </CardTitle>
                       </CardHeader>
                       <CardContent className="space-y-4">
                         <div>
-                          <Label>Meal Types *</Label>
+                          <Label className="text-gray-700 font-semibold">Meal Types *</Label>
                           <div className="flex flex-wrap gap-2 mt-2">
                             {["breakfast", "lunch", "dinner"].map((meal) => (
                               <div key={meal} className="flex items-center space-x-2">
@@ -619,9 +619,9 @@ export default function DynamicMealPlanner({ onAddMealPlan, existingPlans }: Dyn
                     </Card>
 
                     {/* Dietary Restrictions */}
-                    <Card className="bg-gray-700 border-gray-600">
+                    <Card className="bg-white/95 backdrop-blur-sm border border-gray-200/50 shadow-sm">
                       <CardHeader>
-                        <CardTitle className="text-sm">Dietary Restrictions</CardTitle>
+                        <CardTitle className="text-sm text-gray-900">Dietary Restrictions</CardTitle>
                       </CardHeader>
                       <CardContent>
                         <div className="flex flex-wrap gap-2">
@@ -631,8 +631,8 @@ export default function DynamicMealPlanner({ onAddMealPlan, existingPlans }: Dyn
                               variant={constraints.dietaryRestrictions.includes(option) ? "default" : "outline"}
                               className={`cursor-pointer transition-colors ${
                                 constraints.dietaryRestrictions.includes(option)
-                                  ? "bg-purple-600 hover:bg-purple-700"
-                                  : "hover:bg-gray-600"
+                                  ? "bg-purple-600 hover:bg-purple-700 text-white"
+                                  : "hover:bg-purple-50 text-gray-700 border-gray-300"
                               }`}
                               onClick={() => {
                                 if (constraints.dietaryRestrictions.includes(option)) {
@@ -661,9 +661,9 @@ export default function DynamicMealPlanner({ onAddMealPlan, existingPlans }: Dyn
                     </Card>
 
                     {/* Preferred Proteins */}
-                    <Card className="bg-gray-700 border-gray-600">
+                    <Card className="bg-white/95 backdrop-blur-sm border border-gray-200/50 shadow-sm">
                       <CardHeader>
-                        <CardTitle className="text-sm">Preferred Proteins</CardTitle>
+                        <CardTitle className="text-sm text-gray-900">Preferred Proteins</CardTitle>
                       </CardHeader>
                       <CardContent>
                         <div className="flex flex-wrap gap-2">
@@ -673,8 +673,8 @@ export default function DynamicMealPlanner({ onAddMealPlan, existingPlans }: Dyn
                               variant={constraints.preferredProteins.includes(protein) ? "default" : "outline"}
                               className={`cursor-pointer transition-colors ${
                                 constraints.preferredProteins.includes(protein)
-                                  ? "bg-orange-600 hover:bg-orange-700"
-                                  : "hover:bg-gray-600"
+                                  ? "bg-orange-600 hover:bg-orange-700 text-white"
+                                  : "hover:bg-orange-50 text-gray-700 border-gray-300"
                               }`}
                               onClick={() => {
                                 if (constraints.preferredProteins.includes(protein)) {
@@ -703,9 +703,9 @@ export default function DynamicMealPlanner({ onAddMealPlan, existingPlans }: Dyn
                     </Card>
 
                     {/* Cuisine Preferences */}
-                    <Card className="bg-gray-700 border-gray-600 md:col-span-2">
+                    <Card className="bg-white/95 backdrop-blur-sm border border-gray-200/50 shadow-sm md:col-span-2">
                       <CardHeader>
-                        <CardTitle className="text-sm">Cuisine Preferences</CardTitle>
+                        <CardTitle className="text-sm text-gray-900">Cuisine Preferences</CardTitle>
                       </CardHeader>
                       <CardContent>
                         <div className="flex flex-wrap gap-2">
