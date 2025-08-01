@@ -366,18 +366,60 @@ export default function DynamicMealPlanner({ onAddMealPlan, existingPlans }: Dyn
   const totalMeals = constraints.days * constraints.mealTypes.length
 
   return (
-    <div className="space-y-6">
-      <Card className="bg-gradient-to-r from-purple-900 to-blue-900 border-purple-700">
-        <CardHeader>
-          <CardTitle className="text-white flex items-center">
-            <Sparkles className="mr-2 h-6 w-6" />
-            Dynamic Meal Plan Adaptation
-          </CardTitle>
-          <p className="text-purple-200">
-            AI-powered meal planning that adapts to your budget, schedule, and preferences
-          </p>
+    <div className="space-y-6 animate-slide-in-up">
+      {/* Enhanced Dynamic Meal Planner Card */}
+      <Card className="bg-white/95 backdrop-blur-sm border border-gray-200/50 shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden">
+        <div className="bg-gradient-to-r from-purple-500 via-blue-500 to-teal-500 h-1"></div>
+        <CardHeader className="pb-4">
+          <div className="flex items-start justify-between">
+            <div className="flex items-center space-x-3">
+              <div className="relative">
+                <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-blue-500 rounded-2xl flex items-center justify-center">
+                  <Sparkles className="h-6 w-6 text-white animate-pulse" />
+                </div>
+                <div className="absolute -top-1 -right-1 w-4 h-4 bg-gradient-to-r from-yellow-400 to-orange-400 rounded-full animate-bounce"></div>
+              </div>
+              <div>
+                <CardTitle className="text-gray-900 text-xl md:text-2xl font-bold">
+                  🤖 AI Meal Plan Generator
+                </CardTitle>
+                <p className="text-gray-600 text-sm md:text-base font-medium">
+                  Smart meal planning that adapts to your budget, schedule, and preferences
+                </p>
+              </div>
+            </div>
+            <div className="hidden md:flex items-center space-x-2">
+              <div className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-semibold">
+                ✨ AI Powered
+              </div>
+              <div className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-xs font-semibold">
+                🎯 Personalized
+              </div>
+            </div>
+          </div>
         </CardHeader>
-        <CardContent>
+        
+        <CardContent className="pt-0">
+          {/* Feature Highlights */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+            <div className="text-center p-3 bg-purple-50 rounded-xl">
+              <DollarSign className="h-6 w-6 text-purple-600 mx-auto mb-2" />
+              <div className="text-xs font-semibold text-purple-700">Budget Smart</div>
+            </div>
+            <div className="text-center p-3 bg-blue-50 rounded-xl">
+              <Clock className="h-6 w-6 text-blue-600 mx-auto mb-2" />
+              <div className="text-xs font-semibold text-blue-700">Time Aware</div>
+            </div>
+            <div className="text-center p-3 bg-emerald-50 rounded-xl">
+              <ChefHat className="h-6 w-6 text-emerald-600 mx-auto mb-2" />
+              <div className="text-xs font-semibold text-emerald-700">Skill Based</div>
+            </div>
+            <div className="text-center p-3 bg-amber-50 rounded-xl">
+              <Star className="h-6 w-6 text-amber-600 mx-auto mb-2" />
+              <div className="text-xs font-semibold text-amber-700">Preference</div>
+            </div>
+          </div>
+
           <Dialog
             open={showPlanner}
             onOpenChange={(open) => {
@@ -386,17 +428,30 @@ export default function DynamicMealPlanner({ onAddMealPlan, existingPlans }: Dyn
             }}
           >
             <DialogTrigger asChild>
-              <Button className="bg-purple-600 hover:bg-purple-700 text-white">
-                <ChefHat className="mr-2 h-4 w-4" />
-                Create Dynamic Plan
+              <Button className="w-full bg-gradient-to-r from-purple-600 via-blue-600 to-teal-600 hover:from-purple-700 hover:via-blue-700 hover:to-teal-700 text-white py-4 rounded-2xl font-semibold text-lg shadow-lg hover:shadow-xl transition-all duration-300 interactive-scale">
+                <ChefHat className="mr-3 h-5 w-5 animate-wiggle" />
+                🚀 Create Smart Meal Plan
+                <Sparkles className="ml-3 h-5 w-5 animate-pulse" />
               </Button>
             </DialogTrigger>
-            <DialogContent className="bg-gray-800 border-gray-700 text-white max-w-5xl max-h-[90vh] overflow-y-auto">
-              <DialogHeader>
-                <DialogTitle>Dynamic Meal Plan Generator</DialogTitle>
-                <DialogDescription className="text-gray-400">
-                  Create a personalized meal plan that adapts to your real-life constraints
-                </DialogDescription>
+            
+            <DialogContent className="bg-white/95 backdrop-blur-xl border border-gray-200/50 text-gray-900 max-w-6xl max-h-[90vh] overflow-y-auto rounded-3xl shadow-2xl animate-scale-in">
+              <DialogHeader className="pb-6 border-b border-gray-200">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <DialogTitle className="text-2xl md:text-3xl font-bold text-gradient-primary">
+                      🤖 AI Meal Plan Generator
+                    </DialogTitle>
+                    <DialogDescription className="text-gray-600 text-base md:text-lg mt-2">
+                      Create a personalized meal plan that perfectly fits your lifestyle
+                    </DialogDescription>
+                  </div>
+                  <div className="hidden md:flex items-center space-x-2">
+                    <div className="bg-gradient-to-r from-purple-100 to-blue-100 text-purple-700 px-4 py-2 rounded-full text-sm font-semibold">
+                      ✨ Smart AI
+                    </div>
+                  </div>
+                </div>
               </DialogHeader>
 
               <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
